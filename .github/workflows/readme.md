@@ -42,6 +42,8 @@ gh secret set LOGIN_CLIENTID -b "<yourADClientId>"
 gh secret set LOGIN_DOMAIN -b "<yourdomain>.onmicrosoft.com"
 gh secret set LOGIN_INSTANCEENDPOINT -b "https://login.microsoftonline.com/"
 gh secret set LOGIN_TENANTID -b "<yourTenantId>"
+
+gh variable set RESOURCEGROUP_LOCATION -b "eastus"
 ```
 
 ---
