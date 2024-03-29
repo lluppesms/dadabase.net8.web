@@ -15,10 +15,10 @@ To create these secrets, customize and run this command::
 ``` bash
 gh auth login
 
-gh secret set AZURE_CLIENT_ID -b '<GUID>'
-gh secret set AZURE_CLIENT_SECRET -b '<GUID>'
-gh secret set AZURE_TENANT_ID -b '<GUID>'
-gh secret set AZURE_SUBSCRIPTION_ID -b '<yourAzureSubscriptionId>'
+gh secret set AZURE_CLIENT_ID -b "<GUID>"
+gh secret set AZURE_CLIENT_SECRET -b "<GUID>"
+gh secret set AZURE_TENANT_ID -b "<GUID>"
+gh secret set AZURE_SUBSCRIPTION_ID -b "<yourAzureSubscriptionId>"
 ```
 
 ---
@@ -33,10 +33,10 @@ Secret Values:
 ``` bash
 gh auth login
 
-gh variable set APP_NAME -b 'xxx-dadabase'
-gh variable set RESOURCEGROUP_LOCATION -b 'eastus'
-gh variable set RESOURCE_GROUP_PREFIX -b 'rg_dadabase'
-gh variable set API_KEY -b 'somesecretstring'
+gh variable set APP_NAME -b "xxx-dadabase"
+gh variable set RESOURCEGROUP_LOCATION -b "eastus"
+gh variable set RESOURCE_GROUP_PREFIX -b "rg_dadabase"
+gh variable set API_KEY -b "somesecretstring"
 
 gh secret set LOGIN_CLIENTID -b "<yourADClientId>"
 gh secret set LOGIN_DOMAIN -b "<yourdomain>.onmicrosoft.com"
