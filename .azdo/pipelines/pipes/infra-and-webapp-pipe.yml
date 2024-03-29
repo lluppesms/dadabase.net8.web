@@ -1,0 +1,54 @@
+# ------------------------------------------------------------------------------------------------------------------------
+# Pipeline Template to build and deploy Azure Resources and Application
+# ------------------------------------------------------------------------------------------------------------------------
+parameters:
+- name: environments
+  type: object
+  default: ['DEV']
+- name: runGHASScan
+  default: 'false'
+- name: runMSDevSecOpsScan
+  default: 'false'
+- name: runTests
+  default: 'false'
+
+# ----------------------------------------------------------------------------------------------------
+stages:
+- ${{ if or(eq(lower(parameters.runMSDevSecOpsScan), 'true'), eq(lower(parameters.runGHASScan), 'true')) }}:
+  - stage: ScanApplication
+    displayName: Scan Application
+    jobs:
+    - template: templates/scan-code-template.yml
+      parameters:
+        environmentName: 'DEMO'
+        runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
+        runGHASScan: ${{ parameters.runGHASScan }}
+
+# ----------------------------------------------------------------------------------------------------
+- stage: BuildWebApi
+  displayName: Build WebApi
+  jobs:
+  - template: templates/build-webapp-template.yml
+    parameters:
+      environmentName: 'DEV'
+      runTests: ${{ parameters.runTests }}
+
+# ----------------------------------------------------------------------------------------------------
+- ${{ each environmentName in parameters.environments }} :
+  - stage: CreateInfrastructure${{ environmentName }}
+    displayName: ${{ environmentName }} Infrastructure
+    dependsOn: BuildWebApi
+    condition: succeeded('BuildWebApi')
+    jobs:
+    - template: templates/create-infra-template.yml
+      parameters:
+        environmentName: ${{ environmentName }}
+
+  - stage: Deploy${{ environmentName }}WebApi
+    displayName: Deploy ${{ environmentName }} WebApi
+    dependsOn: CreateInfrastructure${{ environmentName }}
+    condition: succeeded('CreateInfrastructure${{ environmentName }}')
+    jobs:
+    - template: templates/deploy-webapp-template.yml
+      parameters:
+        environmentName: ${{ environmentName }}

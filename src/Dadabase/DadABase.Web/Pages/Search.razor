@@ -1,0 +1,32 @@
+﻿@page "/search"
+<PageTitle>Search</PageTitle>
+
+<Div Style="padding: 25px;">
+    <h1>Search the Dad-A-Base</h1>
+
+    <div class="alert alert-secondary mt-4">
+        <span class="text-nowrap">
+            Search For:
+            <input type="text" id="inputText"  @bind="SearchTerm" class="form-control" @onkeydown="@CheckForEnterKey" />
+            <br />
+            Category (control+click to select multiple categories):
+            <Select TValue="string" SelectedValuesChanged="@OnMultiSelectValuesChanged" Multiple>
+                <SelectItem value="ALL" selected>All Categories</SelectItem>
+                @foreach (var category in JokeCategories)
+                {
+                    <SelectItem Value="@category">@category</SelectItem>
+                }
+            </Select>
+            <br />
+            <button class="btn btn-primary" id="btnSearch" @onclick="ExecuteSearch" @onkeydown="@CheckForEnterKey">Search</button>
+        </span>
+    </div>
+
+    @foreach (var myJoke in myJokes)
+    {
+        <JokeDisplayComponent myJoke="@myJoke" />
+    }
+    <br />
+    <br />
+    &nbsp;
+</Div>

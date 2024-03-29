@@ -1,0 +1,17 @@
+{
+  "$schema": "https://schema.management.azure.com/schemas/2019-04-01/deploymentParameters.json#",
+  "contentVersion": "1.0.0.0",
+  "parameters": {
+    "appName": { "value": "#{appName}#" },
+    "environmentCode": { "value": "#{environmentNameLower}#" },
+    
+    "adLoginInstanceEndPoint": { "value": "#{loginInstanceEndPoint}#" },
+    "adLoginDomain": { "value": "#{loginDomain}#" },
+    "adLoginTenantId": { "value": "#{loginTenantId}#" },
+    "adLoginClientId": { "value": "#{loginClientId}#" },
+
+    "apiKey": { "value": "#{apiKey}#" },
+
+    "location": { "value": "#{location}#" }
+  }
+}
