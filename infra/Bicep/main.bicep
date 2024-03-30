@@ -72,7 +72,7 @@ module webSiteModule 'website.bicep' = {
     appInsightsLocation: location
     commonTags: commonTags
     sku: webSiteSku
-    environmentCode: environmentCode
+    //environmentCode: environmentCode
     workspaceId: logAnalyticsWorkspaceModule.outputs.id
   }
 }
