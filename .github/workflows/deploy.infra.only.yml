@@ -38,14 +38,14 @@ on:
 jobs:
   scan-code:
     name: Scan Source Code
-    uses: template-scan-code.yml
+    uses: ./.github/workflows/template-scan-code.yml
     with:
       runMSDevSecOpsScan: '${{ inputs.runMSDevSecOpsScan }}'
 
 # ------------------------------------------------------------------------------------------------------------------------
   infra-dev-bicep:
     name: Create ${{ inputs.deployEnvironment }} Bicep Infra 
-    uses: template-create-infra-bicep.yml
+    uses: ./.github/workflows/template-create-infra.yml
     needs: scan-code
     secrets: inherit
     with:

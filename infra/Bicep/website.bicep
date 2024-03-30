@@ -4,7 +4,7 @@
 param webSiteName string = ''
 param location string = resourceGroup().location
 param appInsightsLocation string = resourceGroup().location
-//param environmentCode string = 'dev'
+param environmentCode string = 'dev'
 param commonTags object = {}
 @allowed(['F1','B1','B2','S1','S2','S3'])
 param sku string = 'B1'

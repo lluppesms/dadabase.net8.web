@@ -51,7 +51,7 @@ jobs:
   infra-dev:
     name: Create DEV Infra
     needs: build-app
-    uses: ./.github/workflows/template-create-infra-bicep.yml
+    uses: ./.github/workflows/template-create-infra.yml
     secrets: inherit
     with:
       envCode: 'dev'

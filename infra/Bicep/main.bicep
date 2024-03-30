@@ -7,7 +7,6 @@
 //   az deployment group create -n main-deploy-20221129T150000Z --resource-group rg_dadabase_test --template-file 'main.bicep' --parameters appName=xxx-dadabase-test environmentCode=demo keyVaultOwnerUserId=xxxxxxxx-xxxx-xxxx
 // --------------------------------------------------------------------------------
 param appName string = ''
-@allowed(['azd','gha','azdo','dev','demo','qa','stg','ct','prod'])
 param environmentCode string = 'azd'
 param location string = resourceGroup().location
 
@@ -72,7 +71,7 @@ module webSiteModule 'website.bicep' = {
     appInsightsLocation: location
     commonTags: commonTags
     sku: webSiteSku
-    //environmentCode: environmentCode
+    environmentCode: environmentCode
     workspaceId: logAnalyticsWorkspaceModule.outputs.id
   }
 }
