@@ -1,11 +1,11 @@
 # ------------------------------------------------------------------------------------------------------------------------
-# GHA Reusable Called Workflow to deploy an already built WebApi App
+# GHA Reusable Called Workflow to deploy an already built WebApp
 # ------------------------------------------------------------------------------------------------------------------------
 # You need to set up secrets in the GitHub Secrets Repository before running these workflows.
 #   See readme.md for details
 # ------------------------------------------------------------------------------------------------------------------------
-name: template.deploy.webapi
-run-name: Deploy WebApi
+name: template.webapp.deploy
+run-name: Deploy WebApp
 on:
   workflow_call:
     inputs:
@@ -25,7 +25,7 @@ jobs:
     environment:
       name: ${{ inputs.envCode }}
     env:
-      artifactName: webapiapp
+      artifactName: webapp
       generatedAppEnvName: ${{ vars.APP_NAME }}-${{ inputs.envCode }}
 
     steps:

@@ -28,14 +28,14 @@ jobs:
 # ------------------------------------------------------------------------------------------------------------------------
   scan-code:
     name: Scan Source Code
-    uses: ./.github/workflows/template-scan-code.yml
+    uses: ./.github/workflows/template.scan.code.yml
     with:
       runMSDevSecOpsScan: '${{ github.event.inputs.runMSDevSecOpsScan }}'
 
 # ------------------------------------------------------------------------------------------------------------------------
   build-app:
     name: Build WebApi
-    uses: ./.github/workflows/template-webapp-build.yml
+    uses: ./.github/workflows/template.webapp.build.yml
     needs: scan-code
     secrets: inherit
     with:

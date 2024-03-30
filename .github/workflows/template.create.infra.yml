@@ -4,7 +4,7 @@
 # You need to set up secrets in the GitHub Secrets Repository before running these workflows.
 #   See Docs\CreateGitHubSecrets\.md for details
 # ------------------------------------------------------------------------------------------------------------------------
-name: template.deploy.infra.bicep
+name: template.create.infra
 run-name: Deploy Infra Bicep
 on:
   workflow_call:

@@ -35,7 +35,7 @@ gh auth login
 
 gh variable set APP_NAME -b "xxx-dadabase"
 gh variable set RESOURCEGROUP_LOCATION -b "eastus"
-gh variable set RESOURCE_GROUP_PREFIX -b "rg_dadabase"
+gh variable set RESOURCEGROUP_PREFIX -b "rg_dadabase" 
 gh variable set API_KEY -b "somesecretstring"
 
 gh secret set LOGIN_CLIENTID -b "<yourADClientId>"
