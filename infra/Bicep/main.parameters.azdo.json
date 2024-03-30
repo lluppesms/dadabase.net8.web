@@ -5,10 +5,10 @@
     "appName": { "value": "#{appName}#" },
     "environmentCode": { "value": "#{environmentNameLower}#" },
     
-    "adLoginInstanceEndPoint": { "value": "#{adInstance}#" },
-    "adLoginDomain": { "value": "#{adDomain}#" },
-    "adLoginTenantId": { "value": "#{adTenantId}#" },
-    "adLoginClientId": { "value": "#{adClientId}#" },
+    "adInstance": { "value": "#{adInstance}#" },
+    "adDomain": { "value": "#{adDomain}#" },
+    "adTenantId": { "value": "#{adTenantId}#" },
+    "adClientId": { "value": "#{adClientId}#" },
 
     "apiKey": { "value": "#{apiKey}#" },
 
