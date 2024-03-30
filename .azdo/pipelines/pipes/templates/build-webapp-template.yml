@@ -24,19 +24,19 @@ jobs:
     - name: rootDirectory
       value: '$(System.DefaultWorkingDirectory)\$(appFolderName)\'
     - name: projectDirectory
-      value: '$(System.DefaultWorkingDirectory)\$(appProjectFolderName)\'
+      value: '$(System.DefaultWorkingDirectory)\$(appFolderName)\$(appProjectFolderName)\'
     - name: testDirectory
-      value: '$(System.DefaultWorkingDirectory)\$(testFolderName)\'
+      value: '$(System.DefaultWorkingDirectory)\$(appFolderName)\$(testFolderName)\'
     - name: workingDirectory
-      value: '$(System.DefaultWorkingDirectory)\$(appProjectFolderName)\'
+      value: '$(System.DefaultWorkingDirectory)\$(appFolderName)\$(appProjectFolderName)\'
 
     - name: projectFullName
-      value: '$(appProjectFolderName)\$(appProjectName).$(appProjectExtension)'
+      value: '$(appFolderName)\$(appProjectFolderName)\$(appProjectName).$(appProjectExtension)'
     - name: projectFullPath
       value: '$(System.DefaultWorkingDirectory)\$(projectFullName)'
 
     - name: testFullName
-      value: '$(testFolderName)\$(testProjectName).$(appProjectExtension)'
+      value: '$(appFolderName)\$(testFolderName)\$(testProjectName).$(appProjectExtension)'
     - name: testFullPath
       value: '$(System.DefaultWorkingDirectory)\$(testFullName)'
 

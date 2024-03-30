@@ -32,9 +32,9 @@ variables:
     value: 'csproj'
 
   - name: testFolderName 
-    value: 'DadABase.Test'
+    value: 'DadABase.Tests'
   - name: testProjectName
-    value: 'DadABase.Test'
+    value: 'DadABase.Tests'
 
   - name: buildPlatform
     value: 'Any CPU'
