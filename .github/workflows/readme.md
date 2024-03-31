@@ -47,8 +47,8 @@ gh variable set RESOURCEGROUP_LOCATION -b "eastus"
 
 gh variable set APP_PROJECT_FOLDER_NAME -b "src\Dadabase\DadABase.Web"
 gh variable set APP_PROJECT_NAME -b "DadABase.Web"
-gh variable set APP_TEST_FOLDER_NAME -b "src\Dadabase\DadABase.Test"
-gh variable set APP_TEST_PROJECT_NAME -b "DadABase.Test"
+gh variable set APP_TEST_FOLDER_NAME -b "src\Dadabase\DadABase.Tests"
+gh variable set APP_TEST_PROJECT_NAME -b "DadABase.Tests"
 ```
 
 ---
