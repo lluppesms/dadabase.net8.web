@@ -22,6 +22,8 @@ jobs:
       value: ${{ upper(parameters.environmentName) }}
     - name: environmentNameLower
       value: ${{ lower(parameters.environmentName) }}
+    - name: fullAppName
+      value: '$(appName)-$(environmentNameLower)'
     - name: pipelineResourcePath
       value: '$(Pipeline.Workspace)/${{ parameters.pipelineResourceIdentifier }}'
     - name: pipelineResourceDropPath
@@ -29,24 +31,6 @@ jobs:
     - template: ../../vars/var-common.yml
 
   steps:
-  - task: Bash@3
-    displayName: 'Create Variables'
-    continueOnError: true
-    inputs:
-      targetType: 'inline'
-      script: |
-        echo "environmentSpecificApiName=$(environmentSpecificApiName)"
-        echo "appName=$(appName)"
-        echo "environmentName=$(environmentName)"
-        if [[ '$(environmentSpecificApiName)' == '' ]]; then
-          echo "Using environment coded app name: $(appName)-$(environmentName)"
-          fullAppName=$(echo "$(appName)-$(environmentNameLower)" | tr '[:upper:]' '[:lower:]')
-        else 
-          echo "Using environment specific hard-coded name: $(environmentSpecificApiName)"
-          fullAppName=$(echo "$(environmentSpecificApiName)" | tr '[:upper:]' '[:lower:]')
-        fi
-        echo "##vso[task.setvariable variable=fullAppName]$fullAppName"
-
   - task: Bash@3
     displayName: 'Display Variables'
     inputs:
@@ -117,8 +101,7 @@ jobs:
     displayName: 'Display Variables and Tree'
     inputs:
       script: |
-        echo "environmentSpecificApiName=$(environmentSpecificApiName)"
-        echo "apiAppName=$(apiAppName)"
+        echo "fullAppName=$(fullAppName)"
         echo "serviceConnectionName=$(serviceConnectionName)"
         echo "appName=$(appName)"
         echo "environmentName=$(environmentName)"
