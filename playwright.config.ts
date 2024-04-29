@@ -42,12 +42,15 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: process.env.CI ? 
-      process.env.TEST_ENVIRONMENT == 'prod' ? 'http://lll-dadabase.azurewebsites.net' :
-      process.env.TEST_ENVIRONMENT == 'demo' ? 'http://lll-dadabase-web-demo.azurewebsites.net' :
-      process.env.TEST_ENVIRONMENT == 'dev' ? 'http://lll-dadabase-web-dev.azurewebsites.net' :
-      process.env.TEST_ENVIRONMENT == 'qa' ? 'http://lll-dadabase-web-qa.azurewebsites.net' :
-      'http://lll-dadabase-web-demo.azurewebsites.net' : 'https://localhost:44349/',
+    baseURL: 'https://localhost:44349/',
+    //baseURL: 'http://lll-dadabase-web-demo.azurewebsites.net/',
+
+    // baseURL: process.env.CI ? 
+    //   process.env.TEST_ENVIRONMENT == 'prod' ? 'http://lll-dadabase.azurewebsites.net' :
+    //   process.env.TEST_ENVIRONMENT == 'demo' ? 'http://lll-dadabase-web-demo.azurewebsites.net' :
+    //   process.env.TEST_ENVIRONMENT == 'dev' ? 'http://lll-dadabase-web-dev.azurewebsites.net' :
+    //   process.env.TEST_ENVIRONMENT == 'qa' ? 'http://lll-dadabase-web-qa.azurewebsites.net' :
+    //   'http://lll-dadabase-web-demo.azurewebsites.net' : 'https://localhost:44349/',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry'
