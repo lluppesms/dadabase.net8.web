@@ -30,9 +30,12 @@ trigger:
 
 # ----------------------------------------------------------------------------------------------------
 stages:
-- template: pipes/templates/playwright-template.yml
-  parameters:
-    environment: ${{ parameters.environmentToTest }}
-    testType: 'ui'
-    testPath: 'ui-tests'
-    debug: true
+- stage: UITestWebApp
+  displayName: UI Test ${{ parameters.environmentToTest }}
+  jobs:
+  - template: pipes/templates/playwright-template.yml
+    parameters:
+      environment: ${{ parameters.environmentToTest }}
+      testType: 'ui'
+      testPath: 'ui-tests'
+      debug: true
