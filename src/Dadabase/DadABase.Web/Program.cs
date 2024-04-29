@@ -30,13 +30,18 @@ builder.Services.AddSingleton<IJokeRepository, JokeRepository>();
 // ----- Configure Authentication ---------------------------------------------------------------------
 var authSettings = builder.Configuration.GetSection("AzureAD");
 var enableAuth = !string.IsNullOrEmpty(authSettings["TenantId"]);
+
+
+// for now - just make it all open - no auth...
+enableAuth = false;
+
 if (enableAuth)
 {
     // ----- Configure Authentication ---------------------------------------------------------------------
     builder.Services.AddAuthentication(OpenIdConnectDefaults.AuthenticationScheme)
       .AddMicrosoftIdentityWebApp(builder.Configuration.GetSection("AzureAD"));
-    builder.Services.AddControllersWithViews()
-      .AddMicrosoftIdentityUI();
+    //builder.Services.AddControllersWithViews()
+    //  .AddMicrosoftIdentityUI();
     // ----- Configure Authorization ----------------------------------------------------------------------
     builder.Services.AddAuthorization(options =>
     {

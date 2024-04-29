@@ -1,0 +1,38 @@
+# ------------------------------------------------------------------------------------------------------------------------
+# Pipeline to run a UI Smoke Test
+# ------------------------------------------------------------------------------------------------------------------------
+name: $(date:yyyy).$(date:MM).$(date:dd)$(rev:.r)
+pool:
+  vmImage: windows-latest
+
+# ----------------------------------------------------------------------------------------------------
+parameters:
+  - name: environmentToTest
+    displayName: Environment to Test
+    type: string
+    values:
+      - DEMO
+      - DEV
+      - QA
+      - PROD
+    default: DEMO
+
+# ------------------------------------------------------------------------------------------------------------------------
+trigger:
+  - none
+
+# schedules:
+# - cron: '0 12 * * 7'
+#   displayName: Scan Every Saturday
+#   branches:
+#     include:
+#     - main
+
+# ----------------------------------------------------------------------------------------------------
+stages:
+- template: pipes/templates/playwright-template.yml
+  parameters:
+    environment: ${{ parameters.environmentToTest }}
+    testType: 'ui'
+    testPath: 'ui-tests'
+    debug: true

@@ -11,6 +11,7 @@ namespace DadABase.Data;
 /// <summary>
 /// Session Variables
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class SessionState
 {
     ///// <summary>

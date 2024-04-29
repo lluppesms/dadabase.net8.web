@@ -364,3 +364,7 @@ infra/azdKeys.json
 .vscode/launch.json
 .vscode/tasks.json
 /.vscode/settings.json
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/

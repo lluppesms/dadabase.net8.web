@@ -11,6 +11,7 @@ namespace DadABase.Data;
 /// <summary>
 /// Build Info
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class BuildInfo
 {
     /// <summary>

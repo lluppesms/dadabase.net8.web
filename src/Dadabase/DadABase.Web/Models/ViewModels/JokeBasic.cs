@@ -11,6 +11,7 @@ namespace DadABase.Data;
 /// <summary>
 /// Basic Joke ViewModel
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class JokeBasic
 {
     /// <summary>

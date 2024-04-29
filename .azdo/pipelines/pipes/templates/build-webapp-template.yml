@@ -4,7 +4,7 @@
 parameters: 
 - name: environmentName
   default:  'DEV'
-- name: runTests
+- name: runUnitTests
   default: 'false'
 
 # ------------------------------------------------------------------------------------------------------------------------
@@ -117,7 +117,7 @@ jobs:
       workingDirectory: '$(appFolderName)'
 
   # ------------------------------------------------------------------------------------------------------------------------
-  - ${{ if eq(lower(parameters.runTests), 'true') }}:
+  - ${{ if eq(lower(parameters.runUnitTests), 'true') }}:
     - task: DotNetCoreCLI@2
       displayName: 'Restore Tests'
       inputs:
@@ -162,20 +162,31 @@ jobs:
         tree $(Build.ArtifactStagingDirectory)
 
 # ------------------------------------------------------------------------------------------------------------------------
-  - ${{ if eq(lower(parameters.runTests), 'true') }}:
+  - ${{ if eq(lower(parameters.runUnitTests), 'true') }}:
     - task: DotNetCoreCLI@2
       displayName: 'Install Report Generator'
       inputs:
         command: custom
         custom: tool
         arguments: 'install -g dotnet-reportgenerator-globaltool'
+
     - task: PowerShell@2
       displayName: 'Create Code Coverage Report'
       inputs:
         targetType: 'inline'
-        script: reportgenerator -reports:$(Build.SourcesDirectory)/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:HtmlInline_AzurePipelines
-    - task: PublishCodeCoverageResults@1
+        script: reportgenerator -reports:$(Build.SourcesDirectory)\**\coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)\CodeCoverage -reporttypes:HtmlInline_AzurePipelines
+
+    - task: CmdLine@2
+      displayName: 'Display Files'
+      inputs:
+        script: |
+          echo "Directory of Build.SourcesDirectory:"
+          tree $(Build.SourcesDirectory)
+          dir $(Build.SourcesDirectory) /s
+      continueOnError: true
+
+    - task: PublishCodeCoverageResults@2
       displayName: 'Publish Code Coverage Report'
       inputs:
         codeCoverageTool: 'cobertura'
-        summaryFileLocation: '$(Build.SourcesDirectory)/**/coverage.cobertura.xml'
+        summaryFileLocation: '$(Build.SourcesDirectory)\**\coverage.cobertura.xml'

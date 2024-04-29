@@ -11,6 +11,7 @@ namespace DadABase.Helpers;
 /// <summary>
 /// Utilities
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class Utilities
 {
     /// <summary>

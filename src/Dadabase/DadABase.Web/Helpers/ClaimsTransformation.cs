@@ -11,6 +11,7 @@ namespace DadABase.Helpers;
 /// <summary>
 /// Claims Transformation Module
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class MyClaimsTransformation : IClaimsTransformation
 {
     /// <summary>

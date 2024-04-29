@@ -11,6 +11,7 @@ namespace DadABase.Data;
 /// <summary>
 /// List of Jokes
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class JokeList
 {
     /// <summary>

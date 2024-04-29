@@ -11,6 +11,7 @@ namespace DadABase.Data;
 /// <summary>
 /// Message Bubble
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class MessageBubble
 {
     /// <summary>
@@ -29,14 +30,14 @@ public class MessageBubble
     public bool Mine { get; set; }
 
     /// <summary>
-    /// Time this message was posted    
+    /// Time this message was posted
     /// </summary>
     public DateTime Time { get; set; }
 
     /// <summary>
-    /// Time this message was posted    
+    /// Time this message was posted
     /// </summary>
-    public string DisplayTime { 
+    public string DisplayTime {
         get {
             return $"{Time:h:mm:ss}";
         }

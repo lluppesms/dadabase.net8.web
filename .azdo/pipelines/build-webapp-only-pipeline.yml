@@ -39,7 +39,7 @@ parameters:
       - PROD
       - MULTIPLE
     default: DEMO
-  - name: runTests
+  - name: runUnitTests
     displayName: Run Unit Tests
     type: boolean
     default: true
@@ -58,7 +58,8 @@ stages:
   - template: pipes/webapi-only-pipe.yml
     parameters:
       environments: ['${{ parameters.deployToEnvironment }}']
-      runTests: ${{ parameters.runTests }}
+      runUnitTests: ${{ parameters.runUnitTests }}
+      runUITests: 'false'
       runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
       runGHASScan: ${{ parameters.runGHASScan }}
 
@@ -66,6 +67,7 @@ stages:
   - template: pipes/webapi-only-pipe.yml
     parameters:
       environments: ['DEV','PROD']
-      runTests: ${{ parameters.runTests }}
+      runUnitTests: ${{ parameters.runUnitTests }}
+      runUITests: 'false'
       runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
       runGHASScan: ${{ parameters.runGHASScan }}

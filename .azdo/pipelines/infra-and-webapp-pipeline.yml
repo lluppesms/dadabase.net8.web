@@ -35,8 +35,12 @@ parameters:
       - PROD
       - MULTIPLE
     default: DEMO
-  - name: runTests
+  - name: runUnitTests
     displayName: Run Unit Tests
+    type: boolean
+    default: true
+  - name: runUITests
+    displayName: Run UI Tests
     type: boolean
     default: true
   - name: runGHASScan
@@ -54,7 +58,8 @@ stages:
   - template: pipes/infra-and-webapp-pipe.yml
     parameters:
       environments: ['${{ parameters.deployToEnvironment }}']
-      runTests: ${{ parameters.runTests }}
+      runUnitTests: ${{ parameters.runUnitTests }}
+      runUITests: ${{ parameters.runUITests }}
       runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
       runGHASScan: ${{ parameters.runGHASScan }}
 
@@ -62,6 +67,7 @@ stages:
   - template: pipes/infra-and-webapp-pipe.yml
     parameters:
       environments: ['DEV','PROD']
-      runTests: ${{ parameters.runTests }}
+      runUnitTests: ${{ parameters.runUnitTests }}
+      runUITests: ${{ parameters.runUITests }}
       runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
       runGHASScan: ${{ parameters.runGHASScan }}

@@ -11,6 +11,7 @@ namespace DadABase.Data;
 /// <summary>
 /// Application Constants
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class Constants
 {
     /// <summary>

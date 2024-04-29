@@ -7,6 +7,7 @@ using Microsoft.ApplicationInsights.Extensibility;
 /// <summary>
 /// Logging Service
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class MyLogger
 {
     /// <summary>

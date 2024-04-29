@@ -3,6 +3,7 @@
 /// <summary>
 /// Session Storage Service
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class SessionStorageService
 {
     readonly ILocalStorageService localStorageSvc;

@@ -6,11 +6,14 @@
 // Index Page Code Behind
 // </summary>
 //-----------------------------------------------------------------------
+using Microsoft.AspNetCore.Authorization;
+
 namespace DadABase.Web.Pages;
 
 /// <summary>
 /// Index Page Code Behind
 /// </summary>
+[AllowAnonymous]
 public partial class Index : ComponentBase
 {
     [Inject] IJSRuntime JsInterop { get; set; }

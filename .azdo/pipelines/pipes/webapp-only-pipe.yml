@@ -9,7 +9,9 @@ parameters:
   default: 'false'
 - name: runMSDevSecOpsScan
   default: 'false'
-- name: runTests
+- name: runUnitTests
+  default: 'false'
+- name: runUITests
   default: 'false'
 
 # ----------------------------------------------------------------------------------------------------
@@ -31,7 +33,7 @@ stages:
   - template: templates/build-webapp-template.yml
     parameters:
       environmentName: 'DEV'
-      runTests: ${{ parameters.runTests }}
+      runUnitTests: ${{ parameters.runUnitTests }}
 
 # ----------------------------------------------------------------------------------------------------
 - ${{ each environmentName in parameters.environments }} :
@@ -41,3 +43,16 @@ stages:
     - template: templates/deploy-webapp-template.yml
       parameters:
         environmentName: ${{ environmentName }}
+
+  - ${{ if eq(lower(parameters.runUITests), 'true') }}:
+    - stage: UITest${{ environmentName }}WebApp
+      displayName: UI Test ${{ environmentName }}
+      dependsOn: DeployApp${{ environmentName }}
+      condition: succeeded('DeployApp${{ environmentName }}')
+      jobs:
+      - template: templates/playwright-template.yml
+        parameters:
+          environment: ${{ environmentName }}
+          testType: 'ui'
+          testPath: 'ui-tests'
+          debug: true

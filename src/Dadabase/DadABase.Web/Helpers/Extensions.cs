@@ -11,6 +11,7 @@ namespace DadABase.Helpers;
 /// <summary>
 /// Generic Extensions
 /// </summary>
+[ExcludeFromCodeCoverage]
 public static class Extensions
 {
     /// <summary>

@@ -9,7 +9,9 @@ parameters:
   default: 'false'
 - name: runMSDevSecOpsScan
   default: 'false'
-- name: runTests
+- name: runUnitTests
+  default: 'false'
+- name: runUITests
   default: 'false'
 
 # ----------------------------------------------------------------------------------------------------
@@ -25,30 +27,43 @@ stages:
         runGHASScan: ${{ parameters.runGHASScan }}
 
 # ----------------------------------------------------------------------------------------------------
-- stage: BuildWebApi
-  displayName: Build WebApi
+- stage: BuildWebApp
+  displayName: Build WebApp
   jobs:
   - template: templates/build-webapp-template.yml
     parameters:
       environmentName: 'DEV'
-      runTests: ${{ parameters.runTests }}
+      runUnitTests: ${{ parameters.runUnitTests }}
 
 # ----------------------------------------------------------------------------------------------------
 - ${{ each environmentName in parameters.environments }} :
   - stage: CreateInfrastructure${{ environmentName }}
     displayName: ${{ environmentName }} Infrastructure
-    dependsOn: BuildWebApi
-    condition: succeeded('BuildWebApi')
+    dependsOn: BuildWebApp
+    condition: succeeded('BuildWebApp')
     jobs:
     - template: templates/create-infra-template.yml
       parameters:
         environmentName: ${{ environmentName }}
 
-  - stage: Deploy${{ environmentName }}WebApi
-    displayName: Deploy ${{ environmentName }} WebApi
+  - stage: Deploy${{ environmentName }}WebApp
+    displayName: Deploy ${{ environmentName }} WebApp
     dependsOn: CreateInfrastructure${{ environmentName }}
     condition: succeeded('CreateInfrastructure${{ environmentName }}')
     jobs:
     - template: templates/deploy-webapp-template.yml
       parameters:
         environmentName: ${{ environmentName }}
+
+  - ${{ if eq(lower(parameters.runUITests), 'true') }}:
+    - stage: UITest${{ environmentName }}WebApp
+      displayName: UI Test ${{ environmentName }}
+      dependsOn: Deploy${{ environmentName }}WebApp
+      condition: succeeded('Deploy${{ environmentName }}WebApp')
+      jobs:
+      - template: templates/playwright-template.yml
+        parameters:
+          environment: ${{ environmentName }}
+          testType: 'ui'
+          testPath: 'ui-tests'
+          debug: true

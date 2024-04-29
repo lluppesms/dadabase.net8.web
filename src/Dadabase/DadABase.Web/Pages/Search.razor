@@ -22,10 +22,12 @@
         </span>
     </div>
 
+    <ul id="jokeList" style="list-style-type: none;">
     @foreach (var myJoke in myJokes)
     {
-        <JokeDisplayComponent myJoke="@myJoke" />
+        <li><JokeDisplayComponent myJoke="@myJoke" /></li>
     }
+    </ul>
     <br />
     <br />
     &nbsp;
