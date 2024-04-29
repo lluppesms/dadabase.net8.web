@@ -9,8 +9,9 @@
             Search For:
             <input type="text" id="inputText"  @bind="SearchTerm" class="form-control" @onkeydown="@CheckForEnterKey" />
             <br />
-            Category (control+click to select multiple categories):
-            <Select TValue="string" SelectedValuesChanged="@OnMultiSelectValuesChanged" Multiple>
+            Category:
+            @* If you want multi-select:  <Select TValue="string" SelectedValuesChanged="@OnMultiSelectValuesChanged" Multiple> *@
+            <Select TValue="string" SelectedValueChanged="@OnSelectedValueChanged">
                 <SelectItem value="ALL" selected>All Categories</SelectItem>
                 @foreach (var category in JokeCategories)
                 {

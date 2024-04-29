@@ -58,6 +58,7 @@ public class JokeBasic
 /// <summary>
 /// Basic Category without the extraneous fields
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class CategoryBasic
 {
     /// <summary>
@@ -69,6 +70,7 @@ public class CategoryBasic
 /// <summary>
 /// List of basic jokes
 /// </summary>
+[ExcludeFromCodeCoverage]
 public class JokeBasicList
 {
     /// <summary>

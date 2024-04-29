@@ -29,11 +29,11 @@ jobs:
     - name: resultsFileTitle
       value: 'playwright-results-${{ parameters.testType }}-${{ parameters.environment }}'
     - name: configFileName
-      value: 'playwright.config.${{ parameters.testType }}.${{ parameters.environment }}.ts'
+      value: 'playwright.config.${{ parameters.testType }}.ts'
     - name: artifactName
       value: $(resultsFileTitle)-${{ parameters.environment }}
     - name: testResultsFilePath
-      value: $(System.DefaultWorkingDirectory)/$(resultsPath)/$(resultsFileTitle).xml
+      value: $(System.DefaultWorkingDirectory)\$(resultsPath)\$(resultsFileTitle).xml
 
   steps:
   - ${{ if eq(true, parameters.debug) }}:
@@ -82,7 +82,7 @@ jobs:
     displayName: 'Run Playwright tests'
     env:
       CI: 'true'
-      TEST_URL: ${{ parameters.baseTestingUrl }}
+      TEST_ENVIRONMENT: ${{ parameters.environment }}
 
   - ${{ if eq(true, parameters.debug) }}:
     - task: CmdLine@2
