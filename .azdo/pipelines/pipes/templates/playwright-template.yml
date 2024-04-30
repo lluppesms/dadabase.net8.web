@@ -3,7 +3,7 @@
 # ------------------------------------------------------------------------------------------------------------------------
 parameters:
 - name: environment
-  default: 'dev'
+  default: 'DEV'
 - name: testType
   default: 'ui'
 - name: baseTestingUrl
@@ -23,7 +23,7 @@ jobs:
   
   variables:
     - name: resultsTitle
-      value: '${{ parameters.testType }} ${{ parameters.environment }} Tests'
+      value: 'Playwright ${{ parameters.testType }} ${{ parameters.environment }} Tests'
     - name: resultsPath
       value: 'test-results-${{ parameters.testType }}-${{ parameters.environment }}'
     - name: resultsFileTitle
@@ -31,7 +31,7 @@ jobs:
     - name: configFileName
       value: 'playwright.config.${{ parameters.testType }}.ts'
     - name: artifactName
-      value: $(resultsFileTitle)-${{ parameters.environment }}
+      value: $(resultsFileTitle)
     - name: testResultsFilePath
       value: $(System.DefaultWorkingDirectory)\$(resultsPath)\$(resultsFileTitle).xml
 
@@ -52,6 +52,7 @@ jobs:
           
           echo "Directory of pipeline workspace $(Pipeline.Workspace):"
           tree $(Pipeline.Workspace)
+          dir $(Pipeline.Workspace) /s
       displayName: 'Display Variables and Tree'
       continueOnError: true
 
@@ -69,14 +70,15 @@ jobs:
   - script: npx playwright install --with-deps
     displayName: 'Install Playwright Browsers'
 
-  - ${{ if eq(true, parameters.debug) }}:
-    - task: CmdLine@2
-      displayName: 'Display Files'
-      inputs:
-        script: |
-          echo "Directory of pipeline workspace:"
-          tree $(Pipeline.Workspace)
-      condition: succeededOrFailed()
+  # - ${{ if eq(true, parameters.debug) }}:
+  #   - task: CmdLine@2
+  #     displayName: 'Display Files'
+  #     inputs:
+  #       script: |
+  #         echo "Directory of pipeline workspace:"
+  #         tree $(Pipeline.Workspace)
+  #         dir $(Pipeline.Workspace) /s
+  #     condition: succeededOrFailed()
 
   - script: npx playwright test ${{ parameters.testPath }} --config $(configFileName)
     displayName: 'Run Playwright tests'
@@ -91,6 +93,7 @@ jobs:
         script: |
           echo "Directory of pipeline workspace:"
           tree $(Pipeline.Workspace)
+          dir $(Pipeline.Workspace) /s
       condition: succeededOrFailed()
       
   - task: PublishTestResults@2

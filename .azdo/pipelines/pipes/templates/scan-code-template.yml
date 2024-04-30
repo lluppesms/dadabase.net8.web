@@ -57,19 +57,19 @@ jobs:
           echo "appProjectFolderName=$(appProjectFolderName)"
           echo "workingDirectoryInfra=$(workingDirectoryInfra)"
           echo "workingDirectoryIgnore=$(workingDirectoryIgnore)"
-          echo "Project Path: $(Build.SourcesDirectory)/$(appProjectFolderName)/*.$(appProjectExtension)"
+          echo "Project Path: $(Build.SourcesDirectory)\$(appProjectFolderName)\*.$(appProjectExtension)"
           echo "Build.SourcesDirectory=$(Build.SourcesDirectory)"
           echo "----------------------------------------"
           echo "##[group]Display All Environment Variables:"
           printenv | sort
           echo "##[endgroup]"
           echo "------------------------------------------------"
-          echo "##[group]Directory of Project Files: $(Build.SourcesDirectory)/$(appProjectFolderName)"
-          tree -L 4 $(Build.SourcesDirectory)/$(appProjectFolderName)
+          echo "##[group]Directory of Project Files: $(Build.SourcesDirectory)\$(appProjectFolderName)"
+          dir $(Build.SourcesDirectory)\$(appProjectFolderName) /s
           echo "##[endgroup]"
           echo "------------------------------------------------"
           echo "##[group]Directory of Full Staging Directory: $(Build.SourcesDirectory)"
-          tree -L 4 $(Build.SourcesDirectory)
+          dir $(Build.SourcesDirectory) /s
           echo "##[endgroup]"
       continueOnError: true
 
@@ -86,20 +86,20 @@ jobs:
       displayName: 'Restore project'
       inputs:
         command: 'restore'
-        projects: '$(Build.SourcesDirectory)\$(appProjectFolderName)\*.$(appProjectExtension)'
+        projects: '$(Build.SourcesDirectory)\$(appFolderName)\$(appProjectFolderName)\*.$(appProjectExtension)'
 
     - ${{ if eq(lower(variables.appProjectExtension), 'csproj') }}:
       - task: DotNetCoreCLI@2
         displayName: Build CS Project
         inputs:
-          projects: '$(Build.SourcesDirectory)\$(appProjectFolderName)\*.$(appProjectExtension)'
+          projects: '$(Build.SourcesDirectory)\$(appFolderName)\$(appProjectFolderName)\*.$(appProjectExtension)'
           arguments: '--output publish_output --configuration Release'
 
     - ${{ if eq(lower(variables.appProjectExtension), 'sqlproj') }}:
       - task: VSBuild@1
         displayName: Build DacPac Project
         inputs:
-          solution: '$(appFolderName)\$(appSolutionName).sln'
+          solution: '$(appFolderName)\$(appFolderName)\$(appSolutionName).sln'
           platform: 'Any CPU'
           configuration: 'Release'
 

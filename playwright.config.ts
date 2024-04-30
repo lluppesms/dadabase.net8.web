@@ -29,10 +29,10 @@ export default defineConfig({
   [
     ['html', { open: 'never' }],
     ['junit', { outputFile: process.env.CI ? 
-      process.env.TEST_ENVIRONMENT == 'prod' ? './test-results-ui-prod/playwright-results-ui-prod.xml' :
-      process.env.TEST_ENVIRONMENT == 'demo' ? './test-results-ui-demo/playwright-results-ui-demo.xml' :
-      process.env.TEST_ENVIRONMENT == 'dev' ? './test-results-ui-dev/playwright-results-ui-dev.xml' :
-      process.env.TEST_ENVIRONMENT == 'qa' ? './test-results-ui-qa/playwright-results-ui-qa.xml' :
+      process.env.TEST_ENVIRONMENT == 'PROD' ? './test-results-ui-prod/playwright-results-ui-prod.xml' :
+      process.env.TEST_ENVIRONMENT == 'DEMO' ? './test-results-ui-demo/playwright-results-ui-demo.xml' :
+      process.env.TEST_ENVIRONMENT == 'DEV' ? './test-results-ui-dev/playwright-results-ui-dev.xml' :
+      process.env.TEST_ENVIRONMENT == 'QA' ? './test-results-ui-qa/playwright-results-ui-qa.xml' :
       './test-results-ui/playwright-results-ui.xml' : './test-results-ui/playwright-results-ui.xml' }]
     ] : 
   [
@@ -46,10 +46,10 @@ export default defineConfig({
     //baseURL: 'http://lll-dadabase-web-demo.azurewebsites.net/',
 
     // baseURL: process.env.CI ? 
-    //   process.env.TEST_ENVIRONMENT == 'prod' ? 'http://lll-dadabase.azurewebsites.net' :
-    //   process.env.TEST_ENVIRONMENT == 'demo' ? 'http://lll-dadabase-web-demo.azurewebsites.net' :
-    //   process.env.TEST_ENVIRONMENT == 'dev' ? 'http://lll-dadabase-web-dev.azurewebsites.net' :
-    //   process.env.TEST_ENVIRONMENT == 'qa' ? 'http://lll-dadabase-web-qa.azurewebsites.net' :
+    //   process.env.TEST_ENVIRONMENT == 'PROD' ? 'http://lll-dadabase.azurewebsites.net' :
+    //   process.env.TEST_ENVIRONMENT == 'DEMO' ? 'http://lll-dadabase-web-demo.azurewebsites.net' :
+    //   process.env.TEST_ENVIRONMENT == 'DEV' ? 'http://lll-dadabase-web-dev.azurewebsites.net' :
+    //   process.env.TEST_ENVIRONMENT == 'QA' ? 'http://lll-dadabase-web-qa.azurewebsites.net' :
     //   'http://lll-dadabase-web-demo.azurewebsites.net' : 'https://localhost:44349/',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */

@@ -123,6 +123,7 @@ jobs:
       inputs:
         command: 'restore'
         projects: '$(testFullName)'
+
     - task: DotNetCoreCLI@2
       displayName: 'Run Tests'
       inputs:
@@ -130,12 +131,14 @@ jobs:
         workingDirectory: '$(testDirectory)'
         publishTestResults: false
         arguments: '--logger trx --results-directory "$(Build.SourcesDirectory)/TestResults/Coverage/" --collect "XPlat Code Coverage"'
+
     - task: PublishTestResults@2
       displayName: 'Publish Test Results'
       inputs:
         testResultsFormat: VSTest
         testResultsFiles: '**/*.trx'
         searchFolder: '$(Build.SourcesDirectory)/TestResults/Coverage/'
+        testRunTitle: 'Unit Tests'
   # ------------------------------------------------------------------------------------------------------------------------
 
   - task: DotNetCoreCLI@2
