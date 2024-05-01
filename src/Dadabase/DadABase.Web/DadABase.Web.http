@@ -1,5 +1,5 @@
 ﻿@DadABase.Web_HostAddress = https://localhost:44349
-@APIKey=Hello, hungry!
+@APIKey=DadJokes!
 
 
 GET {{DadABase.Web_HostAddress}}/api/joke

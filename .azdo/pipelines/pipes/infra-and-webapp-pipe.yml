@@ -60,10 +60,26 @@ stages:
       displayName: UI Test ${{ environmentName }}
       dependsOn: Deploy${{ environmentName }}WebApp
       condition: succeeded('Deploy${{ environmentName }}WebApp')
+      variables:
+        - template: ../vars/var-common.yml
       jobs:
       - template: templates/playwright-template.yml
         parameters:
           environment: ${{ environmentName }}
-          testType: 'ui'
-          testPath: 'ui-tests'
+          testType: ${{ variables.playwrightUITestType }}
+          testPath: ${{ variables.playwrightUITestPath }}
+          debug: true
+
+    - stage: APITest${{ environmentName }}WebApp
+      displayName: API Test ${{ environmentName }}
+      dependsOn: Deploy${{ environmentName }}WebApp
+      condition: succeeded('Deploy${{ environmentName }}WebApp')
+      variables:
+        - template: ../vars/var-common.yml
+      jobs:
+      - template: templates/playwright-template.yml
+        parameters:
+          environment: ${{ environmentName }}
+          testType: ${{ variables.playwrightAPITestType }}
+          testPath: ${{ variables.playwrightAPITestPath }}
           debug: true

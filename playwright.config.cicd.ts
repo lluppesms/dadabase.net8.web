@@ -10,7 +10,7 @@ import { defineConfig, devices } from '@playwright/test';
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  testDir: './ui-tests',
+  testDir: '#{PLAYWRIGHT_TEST_PATH}#',
   
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -28,12 +28,7 @@ export default defineConfig({
   reporter: process.env.CI ? 
   [
     ['html', { open: 'never' }],
-    ['junit', { outputFile: process.env.CI ? 
-      process.env.TEST_ENVIRONMENT == 'PROD' ? './test-results-ui-prod/playwright-results-ui-prod.xml' :
-      process.env.TEST_ENVIRONMENT == 'DEMO' ? './test-results-ui-demo/playwright-results-ui-demo.xml' :
-      process.env.TEST_ENVIRONMENT == 'DEV' ? './test-results-ui-dev/playwright-results-ui-dev.xml' :
-      process.env.TEST_ENVIRONMENT == 'QA' ? './test-results-ui-qa/playwright-results-ui-qa.xml' :
-      './test-results-ui/playwright-results-ui.xml' : './test-results-ui/playwright-results-ui.xml' }]
+    ['junit', { outputFile: '#{PLAYWRIGHT_RESULTS_PATH}#' }]
     ] : 
   [
     ['html', { open: 'never' }]
@@ -42,12 +37,7 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: process.env.CI ? 
-      process.env.TEST_ENVIRONMENT == 'PROD' ? 'http://lll-dadabase.azurewebsites.net' :
-      process.env.TEST_ENVIRONMENT == 'DEMO' ? 'http://lll-dadabase-web-demo.azurewebsites.net' :
-      process.env.TEST_ENVIRONMENT == 'DEV' ? 'http://lll-dadabase-web-dev.azurewebsites.net' :
-      process.env.TEST_ENVIRONMENT == 'QA' ? 'http://lll-dadabase-web-qa.azurewebsites.net' :
-      'http://lll-dadabase-web-demo.azurewebsites.net' : 'https://localhost:44349/',
+    baseURL: '#{PLAYWRIGHT_BASE_URL}#',
 
     /* Collect trace when retrying the failed test. See https://playwright.dev/docs/trace-viewer */
     trace: 'on-first-retry'

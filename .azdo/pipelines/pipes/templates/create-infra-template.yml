@@ -10,7 +10,9 @@ parameters:
 - name: templateFileName
   default: 'main.bicep'
 - name: parameterFileName
-  default: 'main.parameters.azdo.json'
+  default: 'main.bicepparam' # 'main.parameters.azdo.json'
+- name: deploymentMode
+  default: 'Incremental'  # 'Incremental' | 'Complete' | 'Validation'
 
 # ----------------------------------------------------------------------------------------------------
 jobs:
@@ -32,10 +34,10 @@ jobs:
       value: '$(Pipeline.Workspace)/s/${{ parameters.templateFolderName }}/${{ parameters.templateFileName }}'
     - name: parameterFile
       value: '$(Pipeline.Workspace)/s/${{ parameters.templateFolderName }}/${{ parameters.parameterFileName }}'
-    - name: compiledJsonFile
-      value: '${{ parameters.templateFolderName }}/compiled.json'
+
     - template: ../../vars/var-common.yml
 
+  # ----------------------------------------------------------------------------------------------------
   steps:
   - bash: |
       appNameLower=$(echo "$(appName)" | tr '[:upper:]' '[:lower:]')
@@ -136,7 +138,7 @@ jobs:
       resourceGroupName: '$(resourceGroupName)'
       location: '$(location)'
       templateLocation: 'Linked artifact'
-      deploymentMode: 'Incremental'
+      deploymentMode: '${{ parameters.deploymentMode }}'  # 'Incremental' | 'Complete' | 'Validation'
 
   - task: CmdLine@2
     inputs:

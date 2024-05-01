@@ -47,3 +47,16 @@ variables:
     value: '\infra\bicep'
   - name: workingDirectoryIgnore
     value: '\Docs'
+
+  - name: playwrightUITestType
+    value: 'ui'
+  - name: playwrightUITestPath
+    value: 'playwright/ui-tests'
+
+  - name: playwrightAPITestType
+    value: 'api'
+  - name: playwrightAPITestPath
+    value: 'playwright/api-tests'
+
+  - name: playwrightWebsitePrefix
+    value: 'lll-dadabase-web'
