@@ -17,6 +17,7 @@ test('find Dad Joke search page', async ({ page, baseURL }) => {
   await page.goto('/');
   await page.getByRole('link', { name: 'Search' }).click();
   await expect(page.getByRole('heading', { name: 'Search the Dad-A-Base' })).toBeVisible();
+  // await expect(page.getByRole('heading', { name: 'Break the Dad-A-Base UI Test' })).toBeVisible();
 });
 
 // --------------------------------------------------------------------------------

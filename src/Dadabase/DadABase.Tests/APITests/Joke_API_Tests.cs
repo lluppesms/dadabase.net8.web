@@ -72,6 +72,17 @@ public class Joke_API_Tests : BaseTest
         Assert.True(jokeList.Count >= 0, "Found no Jokes!");
     }
 
+    // Assign an owner to the test
+    // https://devblogs.microsoft.com/devops/part-2using-traits-with-different-test-frameworks-in-the-unit-test-explorer/#:~:text=If%20we%20add%20in%20another%20test%20method%20and
+
+    // MS Test?
+    // [Owner("Just for test.")]
+    
+    // NUnit?
+    // [Property("Owner", "Just for test.")]
+
+    // XUnit
+    [Trait("Owner", "Dad")]
     [Fact]
     public void Api_Joke_Search_Works()
     {
@@ -88,6 +99,7 @@ public class Joke_API_Tests : BaseTest
             output.WriteLine($"Joke: {item.Category} {item.Joke}");
         }
         Assert.True(jokeList.Count >= 0, "Found no Jokes!");
+        // Assert.True(jokeList.Count == 0, "Break this test!");
     }
 
     //[Fact]
