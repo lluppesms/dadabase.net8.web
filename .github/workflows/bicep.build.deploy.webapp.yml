@@ -1,10 +1,10 @@
 # ------------------------------------------------------------------------------------------------------------------------
-# GHA Workflow to deploy Azure Resources and WebApi
+# GHA Workflow to deploy Azure Resources and WebApp
 # ------------------------------------------------------------------------------------------------------------------------
 # You need to set up secrets in the GitHub Secrets Repository before running these workflows.
 #   See readme.md for details
 # ------------------------------------------------------------------------------------------------------------------------
-name: deploy.bicep.infra.and.webapi
+name: bicep.build.deploy.webapp
 on: 
   workflow_dispatch:
     inputs:
@@ -34,7 +34,7 @@ jobs:
 
 # ------------------------------------------------------------------------------------------------------------------------
   build-app:
-    name: Build WebApi
+    name: Build WebApp
     uses: ./.github/workflows/template.webapp.build.yml
     needs: scan-code
     secrets: inherit
@@ -58,7 +58,7 @@ jobs:
 
 # ------------------------------------------------------------------------------------------------------------------------
   deploy-dev:
-    name: Deploy WebApi
+    name: Deploy WebApp
     needs: infra-dev
     uses: ./.github/workflows/template.webapp.deploy.yml
     secrets: inherit

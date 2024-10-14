@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------------------------------------------------
-# GHA Workflow to build and test WebApi only - no deploy
+# GHA Workflow to build and test WebApp only - no deploy
 # ------------------------------------------------------------------------------------------------------------------------
 # You need to set up secrets in the GitHub Secrets Repository before running these workflows.
 #   See readme.md for details
@@ -34,7 +34,7 @@ jobs:
 
 # ------------------------------------------------------------------------------------------------------------------------
   build-app:
-    name: Build WebApi
+    name: Build WebApp
     uses: ./.github/workflows/template.webapp.build.yml
     needs: scan-code
     secrets: inherit

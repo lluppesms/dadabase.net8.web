@@ -1,5 +1,5 @@
 # ------------------------------------------------------------------------------------------------------------------------
-# GHA Reusable Called Workflow to build a WebAPI App
+# GHA Reusable Called Workflow to build a Web App
 # ------------------------------------------------------------------------------------------------------------------------
 # You need to set up secrets in the GitHub Secrets Repository before running these workflows.
 #   See readme.md for details
@@ -7,7 +7,7 @@
 # You may also need to updates permissions for this template to work - see note below
 # ------------------------------------------------------------------------------------------------------------------------
 name: template.webapp.build
-run-name: Build WebAPI
+run-name: Build WebApp
 on:
   workflow_call:
     inputs:
