@@ -23,7 +23,7 @@ trigger:
 resources:
   pipelines:
   - pipeline: dadabase.web.build.deploy # internal identifier for the resource
-    source: dadabase.web.build.deploy  # name of the pipeline that produces an artifact
+    source: dbw.infra-and-webapp-pipeline  # name of the pipeline that produces an artifact
     branch: main                           # should only allow builds from the main branch to be used
 
 # ----------------------------------------------------------------------------------------------------

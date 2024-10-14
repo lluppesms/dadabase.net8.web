@@ -1,0 +1,42 @@
+# ------------------------------------------------------------------------------------------------------------------------
+# Pipeline to run a UI Smoke Test
+# ------------------------------------------------------------------------------------------------------------------------
+name: $(date:yyyy).$(date:MM).$(date:dd)$(rev:.r)
+pool:
+  vmImage: windows-latest
+
+# ----------------------------------------------------------------------------------------------------
+parameters:
+  - name: environmentToTest
+    displayName: Environment to Test
+    type: string
+    values:
+      - DEMO
+      - DEV
+      - QA
+      - PROD
+    default: DEMO
+
+# ------------------------------------------------------------------------------------------------------------------------
+resources:
+  pipelines:
+  - pipeline: webapp-pipeline # Internal name of the resource in this YML file
+    source: dbw.infra-and-webapp-pipeline # The name of the pipeline that triggers this pipeline
+    project: Demo # Required only if the source pipeline is in another project
+    trigger: true # Run this pipeline when any run of the source pipeline completes
+
+# ----------------------------------------------------------------------------------------------------
+variables:
+  - template: vars/var-common.yml
+
+# ----------------------------------------------------------------------------------------------------
+stages:
+- stage: UITestWebApp
+  displayName: UI Test ${{ parameters.environmentToTest }}
+  jobs:
+  - template: pipes/templates/playwright-template.yml
+    parameters:
+      environment: ${{ parameters.environmentToTest }}
+      testType: ${{ variables.playwrightUITestType }}
+      testPath: ${{ variables.playwrightUITestPath }}
+      debug: true
