@@ -76,11 +76,15 @@ jobs:
         echo "parameterFilePath=$${{ inputs.templatePath }}${{ inputs.parameterFile }}"
         echo "parameterFileReplaceTokens=${{ inputs.parameterFileReplaceTokens }}"
         echo "---------------------------------"
+        echo "##[group]All Variables:"
         echo "All Variables:"
         echo '${{ toJSON(vars) }}'
+        echo "##[endgroup]"
         echo "---------------------------------"
+        echo "##[group]Directory of Default Working Directory:"
         echo "Files in ${{ github.workspace  }}"
         tree -R ${{ github.workspace  }}
+        echo "##[endgroup]"
       continue-on-error: true
 
     - name: Replace Tokens
