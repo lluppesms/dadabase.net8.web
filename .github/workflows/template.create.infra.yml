@@ -59,7 +59,11 @@ jobs:
     # Actions
     # ------------------------------------------------------------------------------------------------------------------------
     steps:
-    - name: Display Variables
+    - name: Checkout Code
+      if: ${{ inputs.runCreateInfra }}
+      uses: actions/checkout@main
+
+    - name: Display Variables and Files
       run: |-
         echo 'env.generatedAppEnvName=${{ env.generatedAppEnvName }}'
         echo 'env.generatedResourceGroupName=${{ env.generatedResourceGroupName }}'
@@ -77,14 +81,7 @@ jobs:
         echo "---------------------------------"
         echo "Files in ${{ github.workspace  }}"
         tree -R ${{ github.workspace  }}
-        echo "---------------------------------"
-        echo "Files in ${{ github.workspace  }}"
-        ls -R ${{ github.workspace  }}
       continue-on-error: true
-
-    - name: Checkout Code
-      if: ${{ inputs.runCreateInfra }}
-      uses: actions/checkout@main
 
     - name: Replace Tokens
       if: ${{ inputs.runCreateInfra && inputs.parameterFileReplaceTokens == 'true' }}
