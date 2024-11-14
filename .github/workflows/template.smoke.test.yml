@@ -32,8 +32,8 @@ jobs:
     - name: Display Variables
       run: |-
         echo "envCode=${{ inputs.envCode }}"
-        echo "Files in ${{ env.GITHUB_ACTION_PATH }}"
-        tree ${{ env.GITHUB_ACTION_PATH }}
+        echo "Files in ${{ github.action_path }}"
+        tree ${{ github.action_path }}
       continue-on-error: true
 
     - uses: actions/setup-node@v4

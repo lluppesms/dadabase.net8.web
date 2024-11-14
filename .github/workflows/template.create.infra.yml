@@ -75,12 +75,16 @@ jobs:
         echo "envCode=${{ inputs.envCode }}"
         echo "templatePath=${{ inputs.templatePath }}"
         echo "templateFile=${{ inputs.templateFile }}"
+        echo "templateFilePath=${{ inputs.templatePath }}${{ inputs.templateFile }}"
         echo "parameterFile=${{ inputs.parameterFile }}"
         echo "parameterFilePath=${{ env.parameterFilePath }}"
         echo "parameterFileReplaceTokens=${{ inputs.parameterFileReplaceTokens }}"
-        echo "Files in ${{ env.GITHUB_ACTION_PATH }}"
-        ls ${{ env.GITHUB_ACTION_PATH }}
+        echo "---------------------------------"
+        echo "All Variables:"
         echo '${{ toJSON(vars) }}'
+        echo "---------------------------------"
+        echo "Files in ${{ github.action_path }}"
+        ls ${{ github.action_path }}
       continue-on-error: true
 
     - name: Checkout Code

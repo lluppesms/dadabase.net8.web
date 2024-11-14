@@ -109,4 +109,4 @@ jobs:
     - name: List All Files
       if: inputs.listFilesAfterBuild == true
       run: 
-        tree ${{ env.GITHUB_ACTION_PATH }}
+        tree ${{ github.action_path }}
