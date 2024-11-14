@@ -59,14 +59,6 @@ jobs:
     # Actions
     # ------------------------------------------------------------------------------------------------------------------------
     steps:
-    - name: Create Variables
-      run: |
-        if [[ $parameterFile == '' ]]; then
-            echo "parameterFilePath=" >> "$GITHUB_ENV"
-        else
-            echo "parameterFilePath=${{ inputs.templatePath }}${{ inputs.parameterFile }}" >> "$GITHUB_ENV"
-        fi
-
     - name: Display Variables
       run: |-
         echo 'env.generatedAppEnvName=${{ env.generatedAppEnvName }}'
@@ -77,17 +69,17 @@ jobs:
         echo "templateFile=${{ inputs.templateFile }}"
         echo "templateFilePath=${{ inputs.templatePath }}${{ inputs.templateFile }}"
         echo "parameterFile=${{ inputs.parameterFile }}"
-        echo "parameterFilePath=${{ env.parameterFilePath }}"
+        echo "parameterFilePath=$${{ inputs.templatePath }}${{ inputs.parameterFile }}"
         echo "parameterFileReplaceTokens=${{ inputs.parameterFileReplaceTokens }}"
         echo "---------------------------------"
         echo "All Variables:"
         echo '${{ toJSON(vars) }}'
         echo "---------------------------------"
         echo "Files in ${{ github.workspace  }}"
-        ls ${{ github.workspace  }}
+        tree ${{ github.workspace  }}
         echo "---------------------------------"
         echo "Files 4 in ${{ github.workspace  }}"
-        ls -4 ${{ github.workspace  }}
+        tree -4 ${{ github.workspace  }}
       continue-on-error: true
 
     - name: Checkout Code
@@ -103,7 +95,7 @@ jobs:
 
     - name: Display Parm File
       run: |-
-        cat ${{ env.parameterFilePath }}
+        cat ${{ inputs.templatePath }}${{ inputs.parameterFile }}
       continue-on-error: true
       
     # Login with OpenID Connect
@@ -133,7 +125,7 @@ jobs:
         region: ${{ vars.RESOURCEGROUP_LOCATION }}
         resourceGroupName: ${{ env.generatedResourceGroupName }}
         template: ${{ inputs.templatePath }}${{ inputs.templateFile }}
-        parameters: ${{ env.parameterFilePath }}
+        parameters: ${{ inputs.templatePath }}${{ inputs.parameterFile }}
         deploymentMode: ${{ inputs.deploymentMode }} # Must be: Incremental | Complete | Validation
 
     - name: Display Output
