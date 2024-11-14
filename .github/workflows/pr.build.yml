@@ -1,29 +1,10 @@
 # ------------------------------------------------------------------------------------------------------------------------
-# GHA Workflow to build and unit test WebApp only - no app or bicep deploy
+# GHA Workflow to scan and build WebApp only - no app or bicep deploy
 # ------------------------------------------------------------------------------------------------------------------------
 # FYI: You need to set up some secrets before running this workflows - see CreateGitHubSecrets.md for details.
 # ------------------------------------------------------------------------------------------------------------------------
-name: 2.build.app.only
-on:
-  workflow_dispatch:
-    inputs:
-      runSecurityScan:
-        description: 'Run Security Scan'
-        required: false
-        default: 'false'
-        type: choice
-        options:
-          - true
-          - false
-      logLevel:
-        description: 'Log level'
-        required: false
-        default: 'warning' 
-        type: choice
-        options:
-          - info
-          - warning
-          - debug 
+name: 5.pull.request.build
+on: pull_request
 
 jobs:
 # ------------------------------------------------------------------------------------------------------------------------
@@ -36,8 +17,8 @@ jobs:
       contents: write
       checks: write
     with:
-      runSecurityScan: ${{ inputs.runSecurityScan == 'true' }}
-
+      runSecurityScan: true
+      
 # ------------------------------------------------------------------------------------------------------------------------
   build-app:
     name: Build WebApp

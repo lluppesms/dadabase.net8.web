@@ -14,7 +14,7 @@ var sanitizedAppName = replace(replace(replace(toLower(appName), ' ', ''), '-', 
 var resourceAbbreviations = loadJsonContent('./resourceAbbreviations.json')
 
 // --------------------------------------------------------------------------------
-output logAnalyticsWorkspaceName string =  toLower('${sanitizedAppNameWithDashes}-${sanitizedEnvironment}-logworkspace')
+output logAnalyticsWorkspaceName string = toLower('${sanitizedAppNameWithDashes}-${sanitizedEnvironment}-logworkspace')
 var webSiteName                         = toLower('${sanitizedAppNameWithDashes}-${sanitizedEnvironment}')
 output webSiteName string               = webSiteName
 output webSiteAppServicePlanName string = '${webSiteName}-${resourceAbbreviations.appServicePlanSuffix}'

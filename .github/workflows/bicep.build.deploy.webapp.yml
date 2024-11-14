@@ -1,16 +1,47 @@
 # ------------------------------------------------------------------------------------------------------------------------
 # GHA Workflow to deploy Azure Resources and WebApp
 # ------------------------------------------------------------------------------------------------------------------------
-# You need to set up secrets in the GitHub Secrets Repository before running these workflows.
-#   See readme.md for details
+# FYI: You need to set up some secrets before running this workflows - see CreateGitHubSecrets.md for details.
 # ------------------------------------------------------------------------------------------------------------------------
-name: bicep.build.deploy.webapp
+name: 4.bicep.build.deploy.app
 on: 
   workflow_dispatch:
     inputs:
+      runSecurityScan:
+        description: 'Run Security Scan'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - true
+          - false
+      runCreateInfra:
+        description: 'Deploy Bicep'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - true
+          - false
+      runBuildDeploy:
+        description: 'Build and Deploy App'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - true
+          - false
+      runSmokeTest:
+        description: 'Run Smoke Tests'
+        required: false
+        default: 'true'
+        type: choice
+        options:
+          - true
+          - false
       logLevel:
-        description: 'Log level'     
-        required: true
+        description: 'Log level'
+        required: false
         default: 'warning' 
         type: choice
         options:
@@ -18,26 +49,53 @@ on:
           - warning
           - debug 
 
-      runMSDevSecOpsScan:
-        description: 'Run MS DevSecOps Scan?'     
-        required: true
-        default: true 
-        type: boolean
-
 jobs:
 # ------------------------------------------------------------------------------------------------------------------------
   scan-code:
     name: Scan Source Code
     uses: ./.github/workflows/template.scan.code.yml
+    secrets: inherit
+    permissions:
+      actions: read
+      contents: write
+      checks: write
     with:
-      runMSDevSecOpsScan: '${{ github.event.inputs.runMSDevSecOpsScan }}'
+      runSecurityScan: ${{ inputs.runSecurityScan == 'true' }}
+
+  # ------------------------------------------------------------------------------------------------------------------------
+  create-infra:
+    name: Create Infra
+    uses: ./.github/workflows/template.create.infra.yml
+    if: inputs.runCreateInfra == 'true' || inputs.runBuildDeploy == 'true'
+    secrets: inherit
+    permissions:
+      id-token: write
+      contents: write
+      actions: read
+      issues: read
+      checks: write
+    with:
+      envCode: 'dev'
+      templatePath: './infra/Bicep/'
+      templateFile: 'main.bicep'
+      parameterFile: 'main.parameters.gha.bicepparam'
+      parameterFileReplaceTokens: 'true'
+      runCreateInfra: ${{ inputs.runCreateInfra == 'true' }}
 
 # ------------------------------------------------------------------------------------------------------------------------
   build-app:
     name: Build WebApp
     uses: ./.github/workflows/template.webapp.build.yml
-    needs: scan-code
+    if: inputs.runBuildDeploy == 'true' || inputs.runSmokeTest == 'true'
+    needs: create-infra
     secrets: inherit
+    permissions:
+      id-token: write
+      contents: write
+      actions: read
+      pull-requests: read
+      issues: read
+      checks: write
     with:
       envCode: 'dev'
       rootDirectory: '${{ vars.APP_PROJECT_FOLDER_NAME }}'
@@ -48,20 +106,31 @@ jobs:
       listFilesAfterBuild: true
 
 # ------------------------------------------------------------------------------------------------------------------------
-  infra-dev:
-    name: Create DEV Infra
-    needs: build-app
-    uses: ./.github/workflows/template.create.infra.yml
-    secrets: inherit
-    with:
-      envCode: 'dev'
-
-# ------------------------------------------------------------------------------------------------------------------------
-  deploy-dev:
+  deploy-app:
     name: Deploy WebApp
-    needs: infra-dev
     uses: ./.github/workflows/template.webapp.deploy.yml
+    if: inputs.runBuildDeploy == 'true' || inputs.runSmokeTest == 'true'
+    needs: build-app
     secrets: inherit
+    permissions:
+      id-token: write
+      contents: write
+      actions: read
     with:
       envCode: 'dev'
 
+      
+# ------------------------------------------------------------------------------------------------------------------------
+  run-smoke-test:
+    name: Test WebApp
+    uses: ./.github/workflows/template.smoke.test.yml
+    if: inputs.runSmokeTest == 'true'
+    needs: deploy-app
+    secrets: inherit
+    permissions:
+      contents: write
+      issues: read
+      checks: write
+      pull-requests: read
+    with:
+      envCode: 'dev'

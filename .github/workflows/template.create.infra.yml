@@ -1,10 +1,9 @@
 # ------------------------------------------------------------------------------------------------------------------------
 # GHA Reusable Called Workflow to deploy Azure Resources Only
 # ------------------------------------------------------------------------------------------------------------------------
-# You need to set up secrets in the GitHub Secrets Repository before running these workflows.
-#   See Docs\CreateGitHubSecrets\.md for details
+# FYI: You need to set up some secrets before running this workflows - see CreateGitHubSecrets.md for details.
 # ------------------------------------------------------------------------------------------------------------------------
-name: template.create.infra
+name: z_template_deploy_infra
 run-name: Deploy Infra Bicep
 on:
   workflow_call:
@@ -12,63 +11,131 @@ on:
       envCode:
         required: true
         type: string
+      templatePath: 
+        required: false
+        type: string
+        default: 'infra/Bicep/'
+      templateFile: 
+        required: false
+        type: string
+        default: 'main.bicep'
+      parameterFile: 
+        required: false
+        type: string
+        default: ''
+      parameterFileReplaceTokens: 
+        required: false
+        type: string
+        default: 'false'
+      deploymentMode: 
+        required: false
+        type: string
+        default: 'Incremental'
+      runCreateInfra:
+        required: false
+        default: true
+        type: boolean
 
 # ------------------------------------------------------------------------------------------------------------------------
 jobs:
   deploy:
-    name: Create Infra
-    runs-on: ubuntu-latest  #windows-latest
+    name: Deploy Bicep
+    runs-on: ubuntu-latest
     environment:
       name: ${{ inputs.envCode }}
+    permissions:
+      id-token: write    
+      contents: read     
+      actions: read    
+      pages: write  
     
+    # ------------------------------------------------------------------------------------------------------------------------
+    # Variables
+    # ------------------------------------------------------------------------------------------------------------------------
     env:
+      envCode: ${{ inputs.envCode }}
       generatedAppEnvName: ${{ vars.APP_NAME }}-${{ inputs.envCode }}
       generatedResourceGroupName: ${{ vars.RESOURCEGROUP_PREFIX }}_${{ inputs.envCode }}
 
+    # ------------------------------------------------------------------------------------------------------------------------
+    # Actions
+    # ------------------------------------------------------------------------------------------------------------------------
     steps:
-    - name: Display Variables
-      run: |-
-        echo 'environmentCode=${{ inputs.envCode }}'
-        echo 'env.generatedAppEnvName=${{ env.generatedAppEnvName }}'
-        echo 'env.generatedResourceGroupName=${{ env.generatedResourceGroupName }}'
-        echo '${{ toJSON(vars) }}'
-      continue-on-error: true
-
     - name: Checkout Code
+      if: ${{ inputs.runCreateInfra }}
       uses: actions/checkout@main
 
+    - name: Display Variables and Files
+      run: |-
+        echo 'env.generatedAppEnvName=${{ env.generatedAppEnvName }}'
+        echo 'env.generatedResourceGroupName=${{ env.generatedResourceGroupName }}'
+        echo "location=${{ vars.RESOURCEGROUP_LOCATION }}"
+        echo "envCode=${{ env.envCode }}"
+        echo "templatePath=${{ inputs.templatePath }}"
+        echo "templateFile=${{ inputs.templateFile }}"
+        echo "templateFilePath=${{ inputs.templatePath }}${{ inputs.templateFile }}"
+        echo "parameterFile=${{ inputs.parameterFile }}"
+        echo "parameterFilePath=$${{ inputs.templatePath }}${{ inputs.parameterFile }}"
+        echo "parameterFileReplaceTokens=${{ inputs.parameterFileReplaceTokens }}"
+        echo "---------------------------------"
+        echo "##[group]All Variables:"
+        echo '${{ toJSON(vars) }}'
+        echo "##[endgroup]"
+        echo "---------------------------------"
+        echo "##[group]Directory of ${{ github.workspace  }}"
+        tree -R ${{ github.workspace  }}
+        echo "##[endgroup]"
+      continue-on-error: true
+
     - name: Replace Tokens
+      if: ${{ inputs.runCreateInfra && inputs.parameterFileReplaceTokens == 'true' }}
       uses: qetza/replacetokens-action@v1
       with:
-        sources: '**/*.parameters.gha.json; !local/ => out/*.parameters.gha.json'
-        variables: '[${{ toJSON(vars) }},${{ toJSON(secrets) }}]' # use variables & secrets
-      
-    - name: Display Files
-      run: 
-        tree ${{ env.GITHUB_ACTION_PATH }}
+        sources: '${{ inputs.templatePath }}${{ inputs.parameterFile }}; !local/ => ${{ inputs.parameterFile }}'
+        variables: '[${{ toJSON(env) }},${{ toJSON(vars) }},${{ toJSON(secrets) }}]' # use environment & variables & secrets
+
+    - name: Display Parm File
+      run: |-
+        echo "##[group]Contents of ${{ inputs.templatePath }}${{ inputs.parameterFile }}"
+        cat ${{ inputs.templatePath }}${{ inputs.parameterFile }}
+        echo "##[endgroup]"
       continue-on-error: true
-  
-    # Login with Client Secret
-    # - name: Log into Azure
-    #   uses: azure/login@v1
-    #   with:
-    #     creds: '{"clientId":"${{ secrets.AZURE_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.AZURE_TENANT_ID }}"}'
-    # Login with OpenID Connect
+      
     - name: Log into Azure
+      if: ${{ inputs.runCreateInfra }}
       uses: azure/login@v2
       with:
-        client-id: ${{ secrets.AZURE_CLIENT_ID }}
-        tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-        subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-  
+        creds: '{"clientId":"${{ secrets.AZURE_CLIENT_ID }}","clientSecret":"${{ secrets.AZURE_CLIENT_SECRET }}","subscriptionId":"${{ secrets.AZURE_SUBSCRIPTION_ID }}","tenantId":"${{ secrets.AZURE_TENANT_ID }}"}'
+
     - name: Create Resource Group
       run: 
-        az group create --name ${{ env.generatedResourceGroupName }} --location ${{ vars.RESOURCEGROUP_LOCATION }} --tags Environment=${{ inputs.envCode }} Application=${{ vars.APP_NAME }}
+        az group create --name ${{ env.generatedResourceGroupName }} --location ${{ vars.RESOURCEGROUP_LOCATION }} --tags Environment=${{ inputs.envCode }}
 
     - name: Deploy Azure Resources
-      uses: azure/arm-deploy@v1
+      uses: azure/arm-deploy@v2
+      if: ${{ inputs.runCreateInfra }}
+      id: deploy-bicep
       with:
         scope: resourcegroup
+        region: ${{ vars.RESOURCEGROUP_LOCATION }}
         resourceGroupName: ${{ env.generatedResourceGroupName }}
-        template: infra/Bicep/main.bicep
-        parameters: infra/Bicep/out/main.parameters.gha.json environmentCode=${{ inputs.envCode }}
+        template: ${{ inputs.templatePath }}${{ inputs.templateFile }}
+        parameters: ${{ inputs.templatePath }}${{ inputs.parameterFile }}
+        deploymentMode: ${{ inputs.deploymentMode }} # Must be: Incremental | Complete | Validation
+
+    - name: Display Output
+      if: ${{ inputs.runCreateInfra }}
+      run: |-
+        echo ${{ steps.deploy-bicep.outputs.resourceToken }}
+        echo ${{ steps.deploy-bicep.outputs.hostName }}
+      continue-on-error: true
+
+    - name: Write summary
+      if: ${{ inputs.runCreateInfra }}
+      env:
+        SUMMARY: |
+          # Deployment summary
+          - Target Resource Group: ${{ env.generatedResourceGroupName }}
+          - Link to App URL: [https://${{ steps.deploy-bicep.outputs.hostName }}](https://${{ steps.deploy-bicep.outputs.hostName }})
+      run: echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
+      continue-on-error: true
