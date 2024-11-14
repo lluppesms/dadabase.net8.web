@@ -3,7 +3,7 @@
 # ------------------------------------------------------------------------------------------------------------------------
 # FYI: You need to set up some secrets before running this workflows - see CreateGitHubSecrets.md for details.
 # ------------------------------------------------------------------------------------------------------------------------
-name: run.smoke.test.only
+name: 5.smoke.test
 on:
   workflow_dispatch:
     inputs:
@@ -30,7 +30,7 @@ on:
 jobs:
   run-smoke-test:
     name: Test ${{ inputs.deployEnvironment }} Environment
-    uses: ./.github/workflows/template.smoke.test.yml
+    uses: ./.github/workflows/template-smoke-test.yml
     secrets: inherit
     permissions:
       contents: write

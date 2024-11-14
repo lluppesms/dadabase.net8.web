@@ -3,14 +3,14 @@
 # ------------------------------------------------------------------------------------------------------------------------
 # FYI: You need to set up some secrets before running this workflows - see CreateGitHubSecrets.md for details.
 # ------------------------------------------------------------------------------------------------------------------------
-name: 5.pull.request.build
+name: 6.pull.request.build
 on: pull_request
 
 jobs:
 # ------------------------------------------------------------------------------------------------------------------------
   scan-code:
     name: Scan Source Code
-    uses: ./.github/workflows/template.scan.code.yml
+    uses: ./.github/workflows/template-scan-code.yml
     secrets: inherit
     permissions:
       actions: read
@@ -18,11 +18,11 @@ jobs:
       checks: write
     with:
       runSecurityScan: true
-      
+
 # ------------------------------------------------------------------------------------------------------------------------
   build-app:
     name: Build WebApp
-    uses: ./.github/workflows/template.webapp.build.yml
+    uses: ./.github/workflows/template-webapp-build.yml
     needs: scan-code
     secrets: inherit
     permissions:

@@ -1,21 +1,12 @@
 # ------------------------------------------------------------------------------------------------------------------------
-# GHA Workflow to deploy Azure Resources Only
+# GHA Workflow to build and unit test WebApp only - no app or bicep deploy
 # ------------------------------------------------------------------------------------------------------------------------
 # FYI: You need to set up some secrets before running this workflows - see CreateGitHubSecrets.md for details.
 # ------------------------------------------------------------------------------------------------------------------------
-name: 1.bicep.only
-on: 
+name: 2.build.app.only
+on:
   workflow_dispatch:
     inputs:
-      deployEnvironment:
-        description: 'Environment'
-        required: true
-        default: 'dev' 
-        type: choice
-        options:
-          - dev
-          - qa
-          - prod
       runSecurityScan:
         description: 'Run Security Scan'
         required: false
@@ -34,11 +25,11 @@ on:
           - warning
           - debug 
 
-# ------------------------------------------------------------------------------------------------------------------------
 jobs:
+# ------------------------------------------------------------------------------------------------------------------------
   scan-code:
     name: Scan Source Code
-    uses: ./.github/workflows/template.scan.code.yml
+    uses: ./.github/workflows/template-scan-code.yml
     secrets: inherit
     permissions:
       actions: read
@@ -48,18 +39,23 @@ jobs:
       runSecurityScan: ${{ inputs.runSecurityScan == 'true' }}
 
 # ------------------------------------------------------------------------------------------------------------------------
-  create-infra:
-    name: Create Infra
-    uses: ./.github/workflows/template.create.infra.yml
+  build-app:
+    name: Build WebApp
+    uses: ./.github/workflows/template-webapp-build.yml
+    needs: scan-code
     secrets: inherit
-    # permissions:
-    #   id-token: write    
-    #   contents: read     
-    #   actions: read    
-    #   pages: write  
+    permissions:
+      id-token: write
+      contents: write
+      actions: read
+      pull-requests: read
+      issues: read
+      checks: write
     with:
-      envCode: ${{ inputs.deployEnvironment }}
-      templatePath: './infra/Bicep/'
-      templateFile: 'main.bicep'
-      parameterFile: 'main.parameters.gha.bicepparam'
-      parameterFileReplaceTokens: 'true'
+      envCode: 'dev'
+      rootDirectory: '${{ vars.APP_PROJECT_FOLDER_NAME }}'
+      projectName: '${{ vars.APP_PROJECT_NAME }}'
+      testDirectory: '${{ vars.APP_TEST_FOLDER_NAME }}'
+      testProjectName: '${{ vars.APP_TEST_PROJECT_NAME }}'
+      testApplication: true
+      listFilesAfterBuild: true

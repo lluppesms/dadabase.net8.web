@@ -4,7 +4,7 @@
 # You need to set up secrets in the GitHub Secrets Repository before running these workflows.
 #   See readme.md for details
 # ------------------------------------------------------------------------------------------------------------------------
-name: template.webapp.deploy
+name: z_template_webapp_deploy
 run-name: Deploy WebApp
 on:
   workflow_call:
