@@ -77,12 +77,10 @@ jobs:
         echo "parameterFileReplaceTokens=${{ inputs.parameterFileReplaceTokens }}"
         echo "---------------------------------"
         echo "##[group]All Variables:"
-        echo "All Variables:"
         echo '${{ toJSON(vars) }}'
         echo "##[endgroup]"
         echo "---------------------------------"
-        echo "##[group]Directory of Default Working Directory:"
-        echo "Files in ${{ github.workspace  }}"
+        echo "##[group]Directory of ${{ github.workspace  }}"
         tree -R ${{ github.workspace  }}
         echo "##[endgroup]"
       continue-on-error: true
@@ -96,17 +94,11 @@ jobs:
 
     - name: Display Parm File
       run: |-
+        echo "##[group]Contents of ${{ inputs.templatePath }}${{ inputs.parameterFile }}"
         cat ${{ inputs.templatePath }}${{ inputs.parameterFile }}
+        echo "##[endgroup]"
       continue-on-error: true
       
-    # Login with OpenID Connect
-    # - name: Log into Azure
-    #   uses: azure/login@v2
-    #   with:
-    #     client-id: ${{ secrets.AZURE_CLIENT_ID }}
-    #     tenant-id: ${{ secrets.AZURE_TENANT_ID }}
-    #     subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-    # Login with Client Secret
     - name: Log into Azure
       if: ${{ inputs.runCreateInfra }}
       uses: azure/login@v2
@@ -143,7 +135,5 @@ jobs:
           # Deployment summary
           - Target Resource Group: ${{ env.generatedResourceGroupName }}
           - Link to App URL: [https://${{ steps.deploy-bicep.outputs.hostName }}](https://${{ steps.deploy-bicep.outputs.hostName }})
-          # GitHub Action Variables
-          - Set the GitHub repository variable RESOURCE_TOKEN to: ${{ steps.deploy-bicep.outputs.resourceToken }}
       run: echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
       continue-on-error: true
