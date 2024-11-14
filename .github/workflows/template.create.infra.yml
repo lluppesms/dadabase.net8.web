@@ -83,8 +83,11 @@ jobs:
         echo "All Variables:"
         echo '${{ toJSON(vars) }}'
         echo "---------------------------------"
-        echo "Files in ${{ github.action_path }}"
-        ls ${{ github.action_path }}
+        echo "Files in ${{ github.workspace  }}"
+        ls ${{ github.workspace  }}
+        echo "---------------------------------"
+        echo "Files 4 in ${{ github.workspace  }}"
+        ls -4 ${{ github.workspace  }}
       continue-on-error: true
 
     - name: Checkout Code
@@ -97,6 +100,11 @@ jobs:
       with:
         sources: '${{ inputs.templatePath }}${{ inputs.parameterFile }}; !local/ => ${{ inputs.parameterFile }}'
         variables: '[${{ toJSON(vars) }},${{ toJSON(secrets) }}]' # use variables & secrets
+
+    - name: Display Parm File
+      run: |-
+        cat ${{ env.parameterFilePath }}
+      continue-on-error: true
       
     # Login with OpenID Connect
     # - name: Log into Azure
