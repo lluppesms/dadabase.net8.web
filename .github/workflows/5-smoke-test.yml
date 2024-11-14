@@ -29,9 +29,10 @@ on:
 # ------------------------------------------------------------------------------------------------------------------------
 jobs:
   run-smoke-test:
-    name: Test ${{ inputs.deployEnvironment }} Environment
+    name: Smoke Test ${{ inputs.deployEnvironment }} Environment
     uses: ./.github/workflows/template-smoke-test.yml
     secrets: inherit
     with:
       envCode: ${{ inputs.deployEnvironment }}
       testPath: 'playwright/ui-tests'
+      testType: 'ui'
