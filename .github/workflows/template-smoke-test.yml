@@ -48,7 +48,7 @@ jobs:
         tree ${{ github.action_path }}
       continue-on-error: true
 
-    - name: Replace Tokens
+    - name: Replace Tokens in Config
       uses: qetza/replacetokens-action@v1
       with:
         sources: './${{ env.configFileName }}; !local/ => ${{ env.configFileName }}'
@@ -61,46 +61,31 @@ jobs:
         echo "##[endgroup]"
       continue-on-error: true
 
-    - uses: actions/setup-node@v4
+    - name: Install Node
+      uses: actions/setup-node@v4
       with:
         node-version: lts/*
 
-    - name: Install dependencies
+    - name: Install Dependencies
       run: npm ci
 
-    - name: Install Playwright Browsers
+    - name: Install Playwright
       run: npx playwright install --with-deps
 
-    - name: Run Playwright tests
+    - name: Run Playwright Tests
       run: npx playwright test ${{ inputs.testPath }} --config ${{ env.configFileName }}
-      #run: npx playwright test
 
-    - uses: actions/upload-artifact@v4
+    - name: Save Test Results Artifact
+      uses: actions/upload-artifact@v4
       if: always()
       with:
         name: playwright-report
         path: playwright-report/
         retention-days: 30
 
-    # AZDO Variables and task...
-    # - name: testResultsTitle
-    #   value: 'Playwright ${{ parameters.testType }} ${{ parameters.environment }} Tests'
-    # - name: testResultsFolderName
-    #   value: 'test-results-${{ parameters.testType }}-${{ parameters.environment }}'
-    # - name: testResultsFileName
-    #   value: 'playwright-results-${{ parameters.testType }}-${{ parameters.environment }}.xml'
-    # - name: testResultsFullPath
-    #   value: '$(System.DefaultWorkingDirectory)\$(testResultsFolderName)\$(testResultsFileName)'
-    # - task: PublishTestResults@2
-    #   displayName: 'Report Test Results'
-    #   inputs:
-    #     testRunTitle: $(testResultsTitle)
-    #     testResultsFormat: 'JUnit'
-    #     testResultsFiles: $(testResultsFullPath)
-    #   condition: succeededOrFailed()
     - name: Publish Test Results
       uses: EnricoMi/publish-unit-test-result-action@v2
       with:
         files: |
-          **/test-results-**/**/*.xml
+          **/${{ env.PLAYWRIGHT_RESULTS_PATH }}
       continue-on-error: true
