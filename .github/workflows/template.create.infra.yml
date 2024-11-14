@@ -76,10 +76,10 @@ jobs:
         echo '${{ toJSON(vars) }}'
         echo "---------------------------------"
         echo "Files in ${{ github.workspace  }}"
-        tree ${{ github.workspace  }}
+        tree -R ${{ github.workspace  }}
         echo "---------------------------------"
-        echo "Files 4 in ${{ github.workspace  }}"
-        tree -4 ${{ github.workspace  }}
+        echo "Files in ${{ github.workspace  }}"
+        ls -R ${{ github.workspace  }}
       continue-on-error: true
 
     - name: Checkout Code
