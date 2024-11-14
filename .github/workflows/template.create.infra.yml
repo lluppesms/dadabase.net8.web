@@ -52,6 +52,7 @@ jobs:
     # Variables
     # ------------------------------------------------------------------------------------------------------------------------
     env:
+      envCode: ${{ inputs.envCode }}
       generatedAppEnvName: ${{ vars.APP_NAME }}-${{ inputs.envCode }}
       generatedResourceGroupName: ${{ vars.RESOURCEGROUP_PREFIX }}_${{ inputs.envCode }}
 
@@ -68,7 +69,7 @@ jobs:
         echo 'env.generatedAppEnvName=${{ env.generatedAppEnvName }}'
         echo 'env.generatedResourceGroupName=${{ env.generatedResourceGroupName }}'
         echo "location=${{ vars.RESOURCEGROUP_LOCATION }}"
-        echo "envCode=${{ inputs.envCode }}"
+        echo "envCode=${{ env.envCode }}"
         echo "templatePath=${{ inputs.templatePath }}"
         echo "templateFile=${{ inputs.templateFile }}"
         echo "templateFilePath=${{ inputs.templatePath }}${{ inputs.templateFile }}"
@@ -90,7 +91,7 @@ jobs:
       uses: qetza/replacetokens-action@v1
       with:
         sources: '${{ inputs.templatePath }}${{ inputs.parameterFile }}; !local/ => ${{ inputs.parameterFile }}'
-        variables: '[${{ toJSON(vars) }},${{ toJSON(secrets) }}]' # use variables & secrets
+        variables: '[${{ toJSON(env) }},${{ toJSON(vars) }},${{ toJSON(secrets) }}]' # use environment & variables & secrets
 
     - name: Display Parm File
       run: |-
