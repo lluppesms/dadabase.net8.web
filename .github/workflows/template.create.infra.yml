@@ -71,8 +71,7 @@ jobs:
       run: |-
         echo 'env.generatedAppEnvName=${{ env.generatedAppEnvName }}'
         echo 'env.generatedResourceGroupName=${{ env.generatedResourceGroupName }}'
-        echo "generatedResourceGroupName=${{ env.generatedResourceGroupName }}"
-        echo "location=${{ vars.AZURE_LOCATION }}"
+        echo "location=${{ vars.RESOURCEGROUP_LOCATION }}"
         echo "envCode=${{ inputs.envCode }}"
         echo "templatePath=${{ inputs.templatePath }}"
         echo "templateFile=${{ inputs.templateFile }}"
@@ -111,7 +110,7 @@ jobs:
 
     - name: Create Resource Group
       run: 
-        az group create --name ${{ env.generatedResourceGroupName }} --location ${{ vars.AZURE_LOCATION }} --tags Environment=${{ inputs.envCode }}
+        az group create --name ${{ env.generatedResourceGroupName }} --location ${{ vars.RESOURCEGROUP_LOCATION }} --tags Environment=${{ inputs.envCode }}
 
     - name: Deploy Azure Resources
       uses: azure/arm-deploy@v2
@@ -119,7 +118,7 @@ jobs:
       id: deploy-bicep
       with:
         scope: resourcegroup
-        region: ${{ vars.AZURE_LOCATION }}
+        region: ${{ vars.RESOURCEGROUP_LOCATION }}
         resourceGroupName: ${{ env.generatedResourceGroupName }}
         template: ${{ inputs.templatePath }}${{ inputs.templateFile }}
         parameters: ${{ env.parameterFilePath }}
