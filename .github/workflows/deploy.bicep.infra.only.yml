@@ -50,7 +50,7 @@ jobs:
 # ------------------------------------------------------------------------------------------------------------------------
   create-infra:
     name: Create Infra
-    uses: ./.github/workflows/template-create-infra.yml
+    uses: ./.github/workflows/template.create.infra.yml
     secrets: inherit
     permissions:
       id-token: write

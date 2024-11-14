@@ -65,7 +65,7 @@ jobs:
   # ------------------------------------------------------------------------------------------------------------------------
   create-infra:
     name: Create Infra
-    uses: ./.github/workflows/template-create-infra.yml
+    uses: ./.github/workflows/template.create.infra.yml
     if: inputs.runCreateInfra == 'true' || inputs.runBuildDeploy == 'true'
     secrets: inherit
     permissions:
