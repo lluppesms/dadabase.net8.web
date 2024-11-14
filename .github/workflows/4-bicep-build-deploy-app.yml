@@ -7,6 +7,15 @@ name: 4.bicep.build.deploy.app
 on: 
   workflow_dispatch:
     inputs:
+      deployEnvironment:
+        description: 'Environment'
+        required: true
+        default: 'dev' 
+        type: choice
+        options:
+          - dev
+          - qa
+          - prod
       runSecurityScan:
         description: 'Run Security Scan'
         required: false
@@ -75,7 +84,7 @@ jobs:
     #   issues: read
     #   checks: write
     with:
-      envCode: 'dev'
+      envCode: ${{ inputs.deployEnvironment }}
       templatePath: './infra/Bicep/'
       templateFile: 'main.bicep'
       parameterFile: 'main.parameters.gha.bicepparam'
@@ -97,7 +106,7 @@ jobs:
     #   issues: read
     #   checks: write
     with:
-      envCode: 'dev'
+      envCode: ${{ inputs.deployEnvironment }}
       rootDirectory: '${{ vars.APP_PROJECT_FOLDER_NAME }}'
       projectName: '${{ vars.APP_PROJECT_NAME }}'
       testDirectory: '${{ vars.APP_TEST_FOLDER_NAME }}'
@@ -117,7 +126,7 @@ jobs:
     #   contents: write
     #   actions: read
     with:
-      envCode: 'dev'
+      envCode: ${{ inputs.deployEnvironment }}
 
       
 # ------------------------------------------------------------------------------------------------------------------------
@@ -133,4 +142,4 @@ jobs:
     #   checks: write
     #   pull-requests: read
     with:
-      envCode: 'dev'
+      envCode: ${{ inputs.deployEnvironment }}

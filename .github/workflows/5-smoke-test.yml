@@ -38,6 +38,6 @@ jobs:
     #   checks: write
     #   pull-requests: read
     with:
-      envCode: 'dev'
+      envCode: ${{ inputs.deployEnvironment }}
       testPath: 'playwright/ui-tests'
       testConfig: 
