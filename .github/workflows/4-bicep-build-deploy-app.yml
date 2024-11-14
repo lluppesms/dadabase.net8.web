@@ -143,3 +143,5 @@ jobs:
     #   pull-requests: read
     with:
       envCode: ${{ inputs.deployEnvironment }}
+      testPath: 'playwright/ui-tests'
+      testConfig: 
