@@ -44,8 +44,22 @@ jobs:
     - name: Display Variables
       run: |-
         echo "envCode=${{ inputs.envCode }}"
-        echo "Files in ${{ github.action_path }}"
-        tree ${{ github.action_path }}
+        echo "PLAYWRIGHT_TEST_PATH=${{ env.PLAYWRIGHT_TEST_PATH }}"
+        echo "PLAYWRIGHT_RESULTS_PATH=${{ env.PLAYWRIGHT_RESULTS_PATH }}"
+        echo "PLAYWRIGHT_BASE_URL=${{ env.PLAYWRIGHT_BASE_URL }}"
+        echo "---------------------------------"
+        echo "##[group]All Variables:"
+        echo "Environments:"
+        echo '${{ toJSON(env) }}'
+        echo "Variables:"
+        echo '${{ toJSON(vars) }}'
+        echo "Secrets:"
+        echo '${{ toJSON(secrets) }}'
+        echo "##[endgroup]"
+        echo "---------------------------------"
+        echo "##[group]Directory of ${{ github.workspace  }}"
+        tree -R ${{ github.workspace  }}
+        echo "##[endgroup]"
       continue-on-error: true
 
     - name: Replace Tokens in Config

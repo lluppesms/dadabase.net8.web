@@ -69,7 +69,7 @@ jobs:
 
   # ------------------------------------------------------------------------------------------------------------------------
   create-infra:
-    name: Create Infra
+    name: Create Infra ${{ inputs.deployEnvironment }}
     uses: ./.github/workflows/template-create-infra.yml
     if: inputs.runCreateInfra == 'true' || inputs.runBuildDeploy == 'true'
     secrets: inherit
@@ -99,7 +99,7 @@ jobs:
 
 # ------------------------------------------------------------------------------------------------------------------------
   deploy-app:
-    name: Deploy WebApp
+    name: Deploy WebApp ${{ inputs.deployEnvironment }}
     uses: ./.github/workflows/template-webapp-deploy.yml
     if: inputs.runBuildDeploy == 'true' || inputs.runSmokeTest == 'true'
     needs: build-app
@@ -110,7 +110,7 @@ jobs:
       
 # ------------------------------------------------------------------------------------------------------------------------
   run-smoke-test:
-    name: Test WebApp
+    name: Smoke Test ${{ inputs.deployEnvironment }}
     uses: ./.github/workflows/template-smoke-test.yml
     if: inputs.runSmokeTest == 'true'
     needs: deploy-app

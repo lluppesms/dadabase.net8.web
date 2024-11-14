@@ -79,7 +79,9 @@ jobs:
         echo "parameterFileReplaceTokens=${{ inputs.parameterFileReplaceTokens }}"
         echo "---------------------------------"
         echo "##[group]All Variables:"
+        echo '${{ toJSON(env) }}'
         echo '${{ toJSON(vars) }}'
+        echo '${{ toJSON(secrets) }}'
         echo "##[endgroup]"
         echo "---------------------------------"
         echo "##[group]Directory of ${{ github.workspace  }}"

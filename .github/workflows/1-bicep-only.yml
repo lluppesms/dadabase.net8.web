@@ -45,7 +45,7 @@ jobs:
 
 # ------------------------------------------------------------------------------------------------------------------------
   create-infra:
-    name: Create Infra
+    name: Create Infra ${{ inputs.deployEnvironment }}
     uses: ./.github/workflows/template-create-infra.yml
     secrets: inherit
     with:

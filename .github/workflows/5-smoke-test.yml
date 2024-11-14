@@ -29,7 +29,7 @@ on:
 # ------------------------------------------------------------------------------------------------------------------------
 jobs:
   run-smoke-test:
-    name: Smoke Test ${{ inputs.deployEnvironment }} Environment
+    name: Smoke Test ${{ inputs.deployEnvironment }}
     uses: ./.github/workflows/template-smoke-test.yml
     secrets: inherit
     with:

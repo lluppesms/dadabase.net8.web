@@ -31,10 +31,6 @@ jobs:
     name: Scan Source Code
     uses: ./.github/workflows/template-scan-code.yml
     secrets: inherit
-    # permissions:
-    #   actions: read
-    #   contents: write
-    #   checks: write
     with:
       runSecurityScan: ${{ inputs.runSecurityScan == 'true' }}
 
@@ -44,13 +40,6 @@ jobs:
     uses: ./.github/workflows/template-webapp-build.yml
     needs: scan-code
     secrets: inherit
-    # permissions:
-    #   id-token: write
-    #   contents: write
-    #   actions: read
-    #   pull-requests: read
-    #   issues: read
-    #   checks: write
     with:
       envCode: 'dev'
       rootDirectory: '${{ vars.APP_PROJECT_FOLDER_NAME }}'
