@@ -33,7 +33,7 @@ jobs:
     secrets: inherit
     permissions:
       actions: read
-      contents: read
+      contents: write
       checks: write
     with:
       runSecurityScan: ${{ inputs.runSecurityScan == 'true' }}
@@ -46,7 +46,7 @@ jobs:
     secrets: inherit
     permissions:
       id-token: write
-      contents: read
+      contents: write
       actions: read
       pull-requests: read
       issues: read

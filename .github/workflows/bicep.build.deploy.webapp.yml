@@ -57,7 +57,7 @@ jobs:
     secrets: inherit
     permissions:
       actions: read
-      contents: read
+      contents: write
       checks: write
     with:
       runSecurityScan: ${{ inputs.runSecurityScan == 'true' }}
@@ -70,7 +70,7 @@ jobs:
     secrets: inherit
     permissions:
       id-token: write
-      contents: read
+      contents: write
       actions: read
       issues: read
       checks: write
@@ -91,7 +91,7 @@ jobs:
     secrets: inherit
     permissions:
       id-token: write
-      contents: read
+      contents: write
       actions: read
       pull-requests: read
       issues: read
@@ -114,7 +114,7 @@ jobs:
     secrets: inherit
     permissions:
       id-token: write
-      contents: read
+      contents: write
       actions: read
     with:
       envCode: 'dev'
@@ -128,7 +128,7 @@ jobs:
     needs: deploy-app
     secrets: inherit
     permissions:
-      contents: read
+      contents: write
       issues: read
       checks: write
       pull-requests: read

@@ -33,7 +33,7 @@ jobs:
     uses: ./.github/workflows/template.smoke.test.yml
     secrets: inherit
     permissions:
-      contents: read
+      contents: write
       issues: read
       checks: write
       pull-requests: read
