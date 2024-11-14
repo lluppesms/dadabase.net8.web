@@ -1,23 +1,12 @@
 # ------------------------------------------------------------------------------------------------------------------------
 # GHA Workflow to deploy Azure Resources Only
 # ------------------------------------------------------------------------------------------------------------------------
-# You need to set up secrets in the GitHub Secrets Repository before running these workflows.
-#   See readme.md for details
+# FYI: You need to set up some secrets before running this workflows - see CreateGitHubSecrets.md for details.
 # ------------------------------------------------------------------------------------------------------------------------
 name: deploy.bicep.infra.only
 on: 
   workflow_dispatch:
     inputs:
-      logLevel:
-        description: 'Log level'     
-        required: true
-        default: 'warning' 
-        type: choice
-        options:
-          - info
-          - warning
-          - debug 
-
       deployEnvironment:
         description: 'Environment'
         required: true
@@ -27,26 +16,51 @@ on:
           - dev
           - qa
           - prod
-
-      runMSDevSecOpsScan:
-        description: 'Run MS DevSecOps Scan?'     
-        required: true
-        default: false 
-        type: boolean
+      runSecurityScan:
+        description: 'Run Security Scan'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - true
+          - false
+      logLevel:
+        description: 'Log level'
+        required: false
+        default: 'warning' 
+        type: choice
+        options:
+          - info
+          - warning
+          - debug 
 
 # ------------------------------------------------------------------------------------------------------------------------
 jobs:
   scan-code:
     name: Scan Source Code
     uses: ./.github/workflows/template.scan.code.yml
+    secrets: inherit
+    permissions:
+      actions: read
+      contents: read
+      checks: write
     with:
-      runMSDevSecOpsScan: '${{ inputs.runMSDevSecOpsScan }}'
+      runSecurityScan: ${{ inputs.runSecurityScan == 'true' }}
 
 # ------------------------------------------------------------------------------------------------------------------------
-  infra-dev-bicep:
-    name: Create ${{ inputs.deployEnvironment }} Bicep Infra 
-    uses: ./.github/workflows/template.create.infra.yml
-    needs: scan-code
+  create-infra:
+    name: Create Infra
+    uses: ./.github/workflows/template-create-infra.yml
     secrets: inherit
+    permissions:
+      id-token: write
+      contents: read
+      actions: read
+      issues: read
+      checks: write
     with:
       envCode: ${{ inputs.deployEnvironment }}
+      templatePath: './infra/bicep/'
+      templateFile: 'main.bicep'
+      parameterFile: 'main.parameters.gha.bicepparam'
+      parameterFileReplaceTokens: 'true'

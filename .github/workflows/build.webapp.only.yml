@@ -1,16 +1,23 @@
 # ------------------------------------------------------------------------------------------------------------------------
-# GHA Workflow to build and test WebApp only - no deploy
+# GHA Workflow to build and unit test WebApp only - no app or bicep deploy
 # ------------------------------------------------------------------------------------------------------------------------
-# You need to set up secrets in the GitHub Secrets Repository before running these workflows.
-#   See readme.md for details
+# FYI: You need to set up some secrets before running this workflows - see CreateGitHubSecrets.md for details.
 # ------------------------------------------------------------------------------------------------------------------------
 name: build.webapp.only
 on:
   workflow_dispatch:
     inputs:
+      runSecurityScan:
+        description: 'Run Security Scan'
+        required: false
+        default: 'false'
+        type: choice
+        options:
+          - true
+          - false
       logLevel:
-        description: 'Log level'     
-        required: true
+        description: 'Log level'
+        required: false
         default: 'warning' 
         type: choice
         options:
@@ -18,19 +25,18 @@ on:
           - warning
           - debug 
 
-      runMSDevSecOpsScan:
-        description: 'Run MS DevSecOps Scan?'     
-        required: true
-        default: true 
-        type: boolean
-
 jobs:
 # ------------------------------------------------------------------------------------------------------------------------
   scan-code:
     name: Scan Source Code
     uses: ./.github/workflows/template.scan.code.yml
+    secrets: inherit
+    permissions:
+      actions: read
+      contents: read
+      checks: write
     with:
-      runMSDevSecOpsScan: '${{ github.event.inputs.runMSDevSecOpsScan }}'
+      runSecurityScan: ${{ inputs.runSecurityScan == 'true' }}
 
 # ------------------------------------------------------------------------------------------------------------------------
   build-app:
@@ -38,6 +44,13 @@ jobs:
     uses: ./.github/workflows/template.webapp.build.yml
     needs: scan-code
     secrets: inherit
+    permissions:
+      id-token: write
+      contents: read
+      actions: read
+      pull-requests: read
+      issues: read
+      checks: write
     with:
       envCode: 'dev'
       rootDirectory: '${{ vars.APP_PROJECT_FOLDER_NAME }}'

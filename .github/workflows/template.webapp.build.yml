@@ -60,8 +60,18 @@ jobs:
       pull-requests: read
 
     steps:
+    - name: Display Variables
+      env:
+        GITHUB_CONTEXT: ${{ toJson(github) }}
+        JOB_CONTEXT: ${{ toJson(job) }}
+      run: |-
+        echo "inputs.rootDirectory=${{ inputs.rootDirectory }}"
+        echo "GITHUB_CONTEXT=$GITHUB_CONTEXT"
+        echo "JOB_CONTEXT=$JOB_CONTEXT"
+      continue-on-error: true
+
     - name: Checkout Code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
 
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v3
