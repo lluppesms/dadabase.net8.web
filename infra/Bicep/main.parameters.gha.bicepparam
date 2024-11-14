@@ -5,7 +5,7 @@
 using 'main.bicep'
 
 param appName = '#{APP_NAME}#'
-param environmentCode = '#{generatedEnvCode}#'
+param environmentCode = '#{envCode}#'
 
 param adInstance = '#{LOGIN_INSTANCEENDPOINT}#'
 param adDomain = '#{LOGIN_DOMAIN}#'
