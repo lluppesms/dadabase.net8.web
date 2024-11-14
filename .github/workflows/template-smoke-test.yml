@@ -41,6 +41,10 @@ jobs:
     # - name: PLAYWRIGHT_BASE_URL
     #   value: 'http://$(playwrightWebsitePrefix)-${{ lower(parameters.environment) }}.azurewebsites.net'
 
+    #{PLAYWRIGHT_TEST_PATH}#
+    #{PLAYWRIGHT_RESULTS_PATH}#
+    #{PLAYWRIGHT_BASE_URL}#
+
     steps:
     - uses: actions/checkout@v4
     

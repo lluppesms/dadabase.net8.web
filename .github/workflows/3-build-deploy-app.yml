@@ -47,10 +47,10 @@ jobs:
     name: Scan Source Code
     uses: ./.github/workflows/template-scan-code.yml
     secrets: inherit
-    permissions:
-      actions: read
-      contents: write
-      checks: write
+    # permissions:
+    #   actions: read
+    #   contents: write
+    #   checks: write
     with:
       runSecurityScan: ${{ inputs.runSecurityScan == 'true' }}
 
@@ -61,13 +61,13 @@ jobs:
     if: inputs.runBuildDeploy == 'true' || inputs.runSmokeTest == 'true'
     needs: scan-code
     secrets: inherit
-    permissions:
-      id-token: write
-      contents: write
-      actions: read
-      pull-requests: read
-      issues: read
-      checks: write
+    # permissions:
+    #   id-token: write
+    #   contents: write
+    #   actions: read
+    #   pull-requests: read
+    #   issues: read
+    #   checks: write
     with:
       envCode: 'dev'
       rootDirectory: '${{ vars.APP_PROJECT_FOLDER_NAME }}'
@@ -84,10 +84,10 @@ jobs:
     if: inputs.runBuildDeploy == 'true' || inputs.runSmokeTest == 'true'
     needs: build-app
     secrets: inherit
-    permissions:
-      id-token: write
-      contents: write
-      actions: read
+    # permissions:
+    #   id-token: write
+    #   contents: write
+    #   actions: read
     with:
       envCode: 'dev'
 
@@ -99,10 +99,10 @@ jobs:
     if: inputs.runSmokeTest == 'true'
     needs: deploy-app
     secrets: inherit
-    permissions:
-      contents: write
-      issues: read
-      checks: write
-      pull-requests: read
+    # permissions:
+    #   contents: write
+    #   issues: read
+    #   checks: write
+    #   pull-requests: read
     with:
       envCode: 'dev'

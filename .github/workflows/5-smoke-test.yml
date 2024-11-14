@@ -32,13 +32,12 @@ jobs:
     name: Test ${{ inputs.deployEnvironment }} Environment
     uses: ./.github/workflows/template-smoke-test.yml
     secrets: inherit
-    permissions:
-      contents: write
-      issues: read
-      checks: write
-      pull-requests: read
+    # permissions:
+    #   contents: write
+    #   issues: read
+    #   checks: write
+    #   pull-requests: read
     with:
       envCode: 'dev'
-      #testType: 'ui'
       testPath: 'playwright/ui-tests'
       testConfig: 
