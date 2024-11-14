@@ -1,11 +1,11 @@
 # ------------------------------------------------------------------------------------------------------------------------
-# GHA Workflow to deploy Azure Resources and WebApp
+# GHA Workflow to build and deploy WebApp only - no bicep deploy
 # ------------------------------------------------------------------------------------------------------------------------
 # FYI: You need to set up some secrets before running this workflows - see CreateGitHubSecrets.md for details.
 # ------------------------------------------------------------------------------------------------------------------------
-name: 5.bicep.build.deploy.app
+name: 3.build.deploy.app
 
-on: 
+on:
   workflow_dispatch:
     inputs:
       deployEnvironment:
@@ -21,14 +21,6 @@ on:
         description: 'Run Security Scan'
         required: false
         default: 'false'
-        type: choice
-        options:
-          - true
-          - false
-      runCreateInfra:
-        description: 'Deploy Bicep'
-        required: false
-        default: 'true'
         type: choice
         options:
           - true
@@ -68,26 +60,12 @@ jobs:
     with:
       runSecurityScan: ${{ inputs.runSecurityScan == 'true' }}
 
-  # ------------------------------------------------------------------------------------------------------------------------
-  create-infra:
-    name: Create Infra ${{ inputs.deployEnvironment }}
-    uses: ./.github/workflows/template-create-infra.yml
-    if: inputs.runCreateInfra == 'true' || inputs.runBuildDeploy == 'true'
-    secrets: inherit
-    with:
-      envCode: ${{ inputs.deployEnvironment }}
-      templatePath: './infra/Bicep/'
-      templateFile: 'main.bicep'
-      parameterFile: 'main.parameters.gha.bicepparam'
-      parameterFileReplaceTokens: 'true'
-      runCreateInfra: ${{ inputs.runCreateInfra == 'true' }}
-
 # ------------------------------------------------------------------------------------------------------------------------
   build-app:
     name: Build WebApp
     uses: ./.github/workflows/template-webapp-build.yml
     if: inputs.runBuildDeploy == 'true' || inputs.runSmokeTest == 'true'
-    needs: create-infra
+    needs: scan-code
     secrets: inherit
     with:
       envCode: ${{ inputs.deployEnvironment }}
