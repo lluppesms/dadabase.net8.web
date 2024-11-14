@@ -60,7 +60,7 @@ jobs:
       checks: write
     with:
       envCode: ${{ inputs.deployEnvironment }}
-      templatePath: '../infra/Bicep/'
+      templatePath: './infra/Bicep/'
       templateFile: 'main.bicep'
       parameterFile: 'main.parameters.gha.bicepparam'
       parameterFileReplaceTokens: 'true'

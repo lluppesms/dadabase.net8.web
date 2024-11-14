@@ -76,7 +76,7 @@ jobs:
       checks: write
     with:
       envCode: 'dev'
-      templatePath: '../infra/Bicep/'
+      templatePath: './infra/Bicep/'
       templateFile: 'main.bicep'
       parameterFile: 'main.parameters.gha.bicepparam'
       parameterFileReplaceTokens: 'true'
