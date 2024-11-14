@@ -39,3 +39,6 @@ jobs:
       pull-requests: read
     with:
       envCode: 'dev'
+      #testType: 'ui'
+      testPath: 'playwright/ui-tests'
+      testConfig: 

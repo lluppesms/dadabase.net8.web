@@ -10,12 +10,12 @@ on:
       envCode:
         required: true
         type: string
-      # testConfig:
-      #   required: true
-      #   type: string
-      # testPath:
-      #   required: true
-      #   type: string
+      testConfig:
+        required: true
+        type: string
+      testPath:
+        required: true
+        type: string
 
 jobs:
   test:
@@ -26,6 +26,21 @@ jobs:
       issues: read
       checks: write
       pull-requests: read
+    env:
+      envCode: ${{ inputs.envCode }}
+      configFileName: 'playwright.config.cicd.ts'
+
+    # - name: configFileFullPath
+    #   value: '$(Pipeline.Workspace)\s\$(configFileName)'
+    # - name: pipelineArtifactName
+    #   value: 'playwright-results-${{ parameters.testType }}-${{ parameters.environment }}'
+    # - name: PLAYWRIGHT_RESULTS_PATH
+    #   value: './$(testResultsFolderName)/$(testResultsFileName)'
+    # - name: PLAYWRIGHT_TEST_PATH
+    #   value: './${{ parameters.testPath }}'
+    # - name: PLAYWRIGHT_BASE_URL
+    #   value: 'http://$(playwrightWebsitePrefix)-${{ lower(parameters.environment) }}.azurewebsites.net'
+
     steps:
     - uses: actions/checkout@v4
     
@@ -34,6 +49,19 @@ jobs:
         echo "envCode=${{ inputs.envCode }}"
         echo "Files in ${{ github.action_path }}"
         tree ${{ github.action_path }}
+      continue-on-error: true
+
+    - name: Replace Tokens
+      uses: qetza/replacetokens-action@v1
+      with:
+        sources: './${{ env.configFileName }}; !local/ => ${{ env.configFileName }}'
+        variables: '[${{ toJSON(env) }},${{ toJSON(vars) }},${{ toJSON(secrets) }}]' # use environment & variables & secrets
+
+    - name: Display Config File
+      run: |-
+        echo "##[group]Contents of ${{ env.configFileName }}"
+        cat ${{ env.configFileName }}
+        echo "##[endgroup]"
       continue-on-error: true
 
     - uses: actions/setup-node@v4
@@ -47,9 +75,8 @@ jobs:
       run: npx playwright install --with-deps
 
     - name: Run Playwright tests
-      run: npx playwright test
-
-      #run: npx playwright test ${{ inputs.testPath }} --config ${{ inputs.testConfig }}
+      run: npx playwright test ${{ inputs.testPath }} --config ${{ env.configFileName }}
+      #run: npx playwright test
 
     - uses: actions/upload-artifact@v4
       if: always()

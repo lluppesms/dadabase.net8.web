@@ -40,10 +40,10 @@ jobs:
     name: Scan Source Code
     uses: ./.github/workflows/template-scan-code.yml
     secrets: inherit
-    permissions:
-      actions: read
-      contents: write
-      checks: write
+    # permissions:
+    #   actions: read
+    #   contents: write
+    #   checks: write
     with:
       runSecurityScan: ${{ inputs.runSecurityScan == 'true' }}
 
