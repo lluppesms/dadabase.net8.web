@@ -45,8 +45,9 @@ jobs:
       name: ${{ inputs.envCode }}
     permissions:
       id-token: write    
-      contents: write     
-      actions: read      
+      contents: read     
+      actions: read    
+      pages: write  
     
     # ------------------------------------------------------------------------------------------------------------------------
     # Variables
