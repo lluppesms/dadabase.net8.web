@@ -20,11 +20,12 @@ public partial class Search : ComponentBase
     private IReadOnlyList<string> SelectedCategoryList = null;
     private List<Joke> myJokes = new();
     private List<string> JokeCategories = new();
+    private readonly string AllJokesConstant = "ALL";
 
-    /// <summary>
-    /// Initialization
-    /// </summary>
-    protected override async Task OnAfterRenderAsync(bool firstRender)
+	/// <summary>
+	/// Initialization
+	/// </summary>
+	protected override async Task OnAfterRenderAsync(bool firstRender)
     {
         await base.OnAfterRenderAsync(firstRender);
 
@@ -59,7 +60,7 @@ public partial class Search : ComponentBase
     {
         // join the Selected Categories into a comma-delimited string
         var selectedCategories = SelectedCategoryList != null ? string.Join(",", SelectedCategoryList) : "ALL";
-        selectedCategories = selectedCategories.StartsWith("ALL,") ? "ALL" : selectedCategories;
+        selectedCategories = selectedCategories.StartsWith($"{AllJokesConstant},") ? AllJokesConstant : selectedCategories;
 
         await JsInterop.InvokeVoidAsync("focusOnInputField", "btnSearch");
         await JsInterop.InvokeVoidAsync("focusOnInputField", "inputText");

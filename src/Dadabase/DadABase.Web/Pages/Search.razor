@@ -12,7 +12,7 @@
             Category:
             @* If you want multi-select:  <Select TValue="string" SelectedValuesChanged="@OnMultiSelectValuesChanged" Multiple> *@
             <Select TValue="string" SelectedValueChanged="@OnSelectedValueChanged">
-                <SelectItem value="ALL" selected>All Categories</SelectItem>
+                <SelectItem Value="AllJokesConstant" selected>All Categories</SelectItem>
                 @foreach (var category in JokeCategories)
                 {
                     <SelectItem Value="@category">@category</SelectItem>
