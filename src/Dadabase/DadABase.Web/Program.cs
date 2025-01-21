@@ -139,7 +139,10 @@ if (settings.EnableSwagger)
 
 // required if you want to use html, css, or image files...
 app.UseStaticFiles();
-app.UseHttpsRedirection();
+if (!app.Environment.IsDevelopment())
+{
+    app.UseHttpsRedirection();
+}
 
 // routing matches HTTP request and dispatches them to proper endpoings
 app.UseRouting();

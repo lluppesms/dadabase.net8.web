@@ -1,15 +1,18 @@
 #See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+# Original version that I never got to work....
+# See the version in the DadABase.Web folder for the working version
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
+USER $APP_UID
 WORKDIR /app
+EXPOSE 8080
+EXPOSE 8081
 
 FROM mcr.microsoft.com/dotnet/sdk:8.0 AS build
 WORKDIR /src
-
 # Copy everything
 COPY ["DadABase.Tests/", "DadABase.Tests/"]
 COPY ["DadABase.Web/", "DadABase.Web/"]
-
 WORKDIR /src/DadABase.Web
 RUN dotnet restore
 
@@ -19,12 +22,6 @@ RUN dotnet publish -o /app
 FROM base AS final
 WORKDIR /app
 EXPOSE 8080
-#ENV ASPNETCORE_URLS=http://localhost:8080
-#EXPOSE 8080
-#EXPOSE 443
-#EXPOSE 7273
-#EXPOSE 5178
-#ENV ASPNETCORE_URLS=http://localhost:8080
 ENV ASPNETCORE_URLS="http://+"
 #EXPOSE 5000
 COPY --from=publish /app .

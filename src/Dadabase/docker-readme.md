@@ -3,8 +3,17 @@
 ## Build the app
 
 ``` bash
-CD C:\Projects\Dadabase\dadabase.net8.web.gh\src\Dadabase\
-docker build -t dbw -f Dockerfile .
+cd C:\Projects\Dadabase\dadabase.net8.web.gh\src\Dadabase\Dadabase.Web
+cd /mnt/c/Projects/Dadabase/dadabase.net8.web.gh/src/Dadabase/Dadabase.Web
+docker build -t dbw -f Dockerfile . -t 012107
+```
+
+## WSL Tips
+
+If you are in WSL and it says `ERROR: Cannot connect to the Docker daemon... Is the docker daemon running?`, then run this command:
+
+``` bash
+sudo service docker start
 ```
 
 ## Run the app
@@ -12,35 +21,22 @@ docker build -t dbw -f Dockerfile .
 The docker run command creates and runs the container as a single command. This command eliminates the need to run docker create and then docker start. You can also set this command to automatically delete the container when the container stops by adding --rm
 
 ``` bash
-docker run -it --rm dbw
-   Now listening on: http://[::]:8080
-docker run -it --rm dbw -p 7273:443 -p 5178:80 -e ASPNETCORE_HTTPS_PORT=https://+7273
-   Now listening on: http://[::]:8080
-
-docker run --rm -it -p 8000:80 -p 8001:443 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORT=8001 -e ASPNETCORE_ENVIRONMENT=Development -v %APPDATA%\microsoft\UserSecrets\:/root/.microsoft/usersecrets -v %USERPROFILE%\.aspnet\https:/root/.aspnet/https/ dbw
-docker run --rm -it -p 8000:80 -p 8001:443 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORT=8001 -e ASPNETCORE_ENVIRONMENT=Development dbw
-docker run --rm -it -p 8000:80             -e ASPNETCORE_URLS="http://+"           -e ASPNETCORE_HTTPS_PORT=8001 -e ASPNETCORE_ENVIRONMENT=Development dbw
-
-
-docker run --rm -it -p 8000:80 -e ASPNETCORE_URLS="http://+" -e ASPNETCORE_HTTPS_PORT=8001 -e ASPNETCORE_ENVIRONMENT=Development dbw
-
-
-
-dotnet dev-certs https -ep %USERPROFILE%\.aspnet\https\aspnetapp.pfx -p crypticpassword
-dotnet dev-certs https --trust
-dotnet user-secrets -p  Dadabase.Web/Dadabase.Web.csproj set "Kestrel:Certificates:Development:Password" "crypticpassword"
-docker build -t dbw -f Dockerfile .
-docker run --rm -it -p 8000:80 -p 8001:443 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORT=8001 -e ASPNETCORE_ENVIRONMENT=Development -v %APPDATA%\microsoft\UserSecrets\:/root/.microsoft/usersecrets -v %USERPROFILE%\.aspnet\https:/root/.aspnet/https/ dbw
-
+docker run --rm -it -p 8000:8080 dbw 012107
+curl http://localhost:8000
 ```
 
-Run with a parameter:
+I tried lots of things that didn't work...  lots of errors...
+
+Found this note: .NET 8 changed the default port from 80 to 8080...  things have changed...?
+[https://learn.microsoft.com/en-us/dotnet/core/compatibility/containers/8.0/aspnet-port](https://learn.microsoft.com/en-us/dotnet/core/compatibility/containers/8.0/aspnet-port)
+
+## Run with a parameter:
 
 ``` bash
 docker run -it --rm dbw AzureStorageAccountEndpoint="https://xxxxxx.blob.core.windows.net/"
 ```
 
-# Inspect the container
+## Inspect the container
 
 ``` bash
 docker inspect dbw
@@ -104,4 +100,30 @@ docker ps -a
 ``` bash
   docker rmi dbw:latest
   docker rmi mcr.microsoft.com/dotnet/aspnet:9.0
+```
+
+## Debugging commands - things I tried to make this work when it was failing
+
+``` bash
+docker run --rm -it dbw
+   Now listening on: http://[::]:8080
+
+docker run -it --rm dbw -p 7273:443 -p 5178:80 -e ASPNETCORE_HTTPS_PORT=https://+7273
+   Now listening on: http://[::]:8080
+
+docker run -it --rm dbw 012102
+
+docker run --rm -it -p 8000:80 -p 8001:443 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORT=8001 -e ASPNETCORE_ENVIRONMENT=Development -v %APPDATA%\microsoft\UserSecrets\:/root/.microsoft/usersecrets -v %USERPROFILE%\.aspnet\https:/root/.aspnet/https/ dbw
+docker run --rm -it -p 8000:80 -p 8001:443 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORT=8001 -e ASPNETCORE_ENVIRONMENT=Development dbw
+docker run --rm -it -p 8000:80             -e ASPNETCORE_URLS="http://+"           -e ASPNETCORE_HTTPS_PORT=8001 -e ASPNETCORE_ENVIRONMENT=Development dbw
+
+docker run --rm -it -p 8000:80 -e ASPNETCORE_URLS="http://+" -e ASPNETCORE_HTTPS_PORT=8001 -e ASPNETCORE_ENVIRONMENT=Development dbw
+
+docker run --rm -it -p 8080:32768 -p 8081:32769 dbw 012106
+
+dotnet dev-certs https -ep %USERPROFILE%\.aspnet\https\aspnetapp.pfx -p crypticpassword
+dotnet dev-certs https --trust
+dotnet user-secrets -p  Dadabase.Web/Dadabase.Web.csproj set "Kestrel:Certificates:Development:Password" "crypticpassword"
+docker build -t dbw -f Dockerfile .
+docker run --rm -it -p 8000:80 -p 8001:443 -e ASPNETCORE_URLS="https://+;http://+" -e ASPNETCORE_HTTPS_PORT=8001 -e ASPNETCORE_ENVIRONMENT=Development -v %APPDATA%\microsoft\UserSecrets\:/root/.microsoft/usersecrets -v %USERPROFILE%\.aspnet\https:/root/.aspnet/https/ dbw
 ```
