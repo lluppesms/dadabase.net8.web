@@ -5,7 +5,16 @@
 ``` bash
 cd C:\Projects\Dadabase\dadabase.net8.web.gh\src\Dadabase\Dadabase.Web
 cd /mnt/c/Projects/Dadabase/dadabase.net8.web.gh/src/Dadabase/Dadabase.Web
-docker build -t dbw -f Dockerfile . -t 012107
+docker build -t dbw -f Dockerfile . -t 012201
+```
+
+## Run the app
+
+The docker run command creates and runs the container as a single command. This command eliminates the need to run docker create and then docker start. You can also set this command to automatically delete the container when the container stops by adding --rm
+
+``` bash
+docker run --rm -it -p 8000:8080 dbw 012201
+curl http://localhost:8000
 ```
 
 ## WSL Tips
@@ -16,21 +25,14 @@ If you are in WSL and it says `ERROR: Cannot connect to the Docker daemon... Is 
 sudo service docker start
 ```
 
-## Run the app
-
-The docker run command creates and runs the container as a single command. This command eliminates the need to run docker create and then docker start. You can also set this command to automatically delete the container when the container stops by adding --rm
-
-``` bash
-docker run --rm -it -p 8000:8080 dbw 012107
-curl http://localhost:8000
-```
+## .NET 8 Notes
 
 I tried lots of things that didn't work...  lots of errors...
 
 Found this note: .NET 8 changed the default port from 80 to 8080...  things have changed...?
 [https://learn.microsoft.com/en-us/dotnet/core/compatibility/containers/8.0/aspnet-port](https://learn.microsoft.com/en-us/dotnet/core/compatibility/containers/8.0/aspnet-port)
 
-## Run with a parameter:
+## Run with a parameter
 
 ``` bash
 docker run -it --rm dbw AzureStorageAccountEndpoint="https://xxxxxx.blob.core.windows.net/"
