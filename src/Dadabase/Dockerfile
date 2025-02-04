@@ -1,4 +1,9 @@
 #See https://aka.ms/customizecontainer to learn how to customize your debug container and how Visual Studio uses this Dockerfile to build your images for faster debugging.
+# Build in context of the src/Database.Web folder:
+#   docker build -t dbw -f Dockerfile . -t yymmddXX
+# Run the app
+#   docker run --rm -it -p 8000:8080 dbw yymmddXX
+# Browse or curl to http://localhost:8000
 
 FROM mcr.microsoft.com/dotnet/aspnet:8.0 AS base
 USER $APP_UID

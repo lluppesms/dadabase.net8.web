@@ -8,6 +8,7 @@ pool:
   #vmImage: ubuntu-latest   # dacpac restore only runs on Windows...?
 variables:
   - group: Dadabase.Web
+  - template: vars/var-service-connections.yml
 
 # ------------------------------------------------------------------------------------------------------------------------
 trigger:
@@ -29,12 +30,10 @@ parameters:
     displayName: Deploy To
     type: string
     values:
-      - DEMO
       - DEV
       - QA
       - PROD
-      - MULTIPLE
-    default: DEMO
+    default: DEV
   - name: runUnitTests
     displayName: Run Unit Tests
     type: boolean
@@ -54,19 +53,22 @@ parameters:
 
 # ----------------------------------------------------------------------------------------------------
 stages:
-- ${{ if ne(parameters.deployToEnvironment, 'MULTIPLE') }}:
+- ${{ if ne(parameters.deployToEnvironment, 'DEV-QA-PROD') }}:
   - template: pipes/infra-and-webapp-pipe.yml
     parameters:
       environments: ['${{ parameters.deployToEnvironment }}']
+      #singleEnvironment: 'true'
+      parseBicepOutputs: true
       runUnitTests: ${{ parameters.runUnitTests }}
       runUITests: ${{ parameters.runUITests }}
       runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
       runGHASScan: ${{ parameters.runGHASScan }}
 
-- ${{ if eq(parameters.deployToEnvironment, 'MULTIPLE') }}:
+- ${{ if eq(parameters.deployToEnvironment, 'DEV-QA-PROD') }}:
   - template: pipes/infra-and-webapp-pipe.yml
     parameters:
-      environments: ['DEV','PROD']
+      environments: ['DEV','QA','PROD']
+      parseBicepOutputs: true
       runUnitTests: ${{ parameters.runUnitTests }}
       runUITests: ${{ parameters.runUITests }}
       runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}

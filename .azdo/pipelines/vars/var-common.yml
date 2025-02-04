@@ -59,4 +59,4 @@ variables:
     value: 'playwright/api-tests'
 
   - name: playwrightWebsitePrefix
-    value: 'lll-dadabase-web'
+    value: 'lci-dadabase-web'

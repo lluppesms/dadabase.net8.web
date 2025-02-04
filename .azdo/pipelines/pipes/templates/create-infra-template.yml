@@ -1,6 +1,6 @@
 ﻿# ----------------------------------------------------------------------------------------------------
 # Template to deploy Azure Resources in a bicep file in one environment
-# This template is optimized for a Windows build agent -- see create-infra-linux.yml for a Linux build agent
+# This template is optimized for a Linux build agent -- see create-infra-win.yml for a Windows build agent
 # ----------------------------------------------------------------------------------------------------
 parameters:
 - name: environmentName
@@ -10,9 +10,11 @@ parameters:
 - name: templateFileName
   default: 'main.bicep'
 - name: parameterFileName
-  default: 'main.bicepparam' # 'main.parameters.azdo.json'
+  default: 'main.bicepparam'
 - name: deploymentMode
   default: 'Incremental'  # 'Incremental' | 'Complete' | 'Validation'
+- name: parseBicepOutputs
+  default: false
 
 # ----------------------------------------------------------------------------------------------------
 jobs:
@@ -29,13 +31,23 @@ jobs:
       value: ${{ upper(parameters.environmentName) }}
     - name: environmentNameLower
       value: ${{ lower(parameters.environmentName) }}
-    # If you use Windows Build agents, use the \ delimter, if Ubuntu Linux, use the / delimiter
+    # If you use Windows Build agents, use the \ delimiter, if Ubuntu Linux, use the / delimiter
     - name: templateFile
       value: '$(Pipeline.Workspace)/s/${{ parameters.templateFolderName }}/${{ parameters.templateFileName }}'
     - name: parameterFile
       value: '$(Pipeline.Workspace)/s/${{ parameters.templateFolderName }}/${{ parameters.parameterFileName }}'
 
+    # Bring in environment common variable file
+    - template: ../../vars/var-service-connections.yml
     - template: ../../vars/var-common.yml
+    
+    # Bring in environment specific variable files
+    - ${{ if eq(lower(parameters.environmentName), 'dev') }}:
+      - template: ../../vars/var-dev.yml
+    - ${{ if eq(lower(parameters.environmentName), 'qa') }}:
+      - template: ../../vars/var-qa.yml
+    - ${{ if eq(lower(parameters.environmentName), 'prod') }}:
+      - template: ../../vars/var-prod.yml
 
   # ----------------------------------------------------------------------------------------------------
   steps:
@@ -59,13 +71,24 @@ jobs:
     displayName: 'Create Variables'
     continueOnError: true
 
-  
-  - task: Bash@3
-    displayName: 'Display Variables'
+  - bash: |
+      echo "environmentName=${{ parameters.environmentName }}"
+      echo "templateFolderName=${{ parameters.templateFolderName }}"
+      echo "templateFileName=${{ parameters.templateFileName }}"
+      echo "parameterFileName=${{ parameters.parameterFileName }}"
+      echo "deploymentMode=${{ parameters.deploymentMode }}"
+
+      echo "##[group]Display All Environment Variables:"
+      printenv | sort
+      echo "##[endgroup]"
+
+      echo "----------------------------------------"
+      echo "##[group]Directory of pipeline workspace:"
+      tree -L 4 $(Pipeline.Workspace)
+      echo "##[endgroup]"
+    displayName: 'Display Variables and Files'
     continueOnError: true
-    inputs:
-      targetType: 'inline'
-      script: 'env | sort'
+
     # this script version also works
     # - script: |
     #     for var in $(compgen -e); do
@@ -81,27 +104,7 @@ jobs:
     #     printenv | sort
     #   displayName: 'Display Variables'
     #   continueOnError: true
-        
-  - task: CmdLine@2
-    inputs:
-      script: |
-        echo "Tree and files in pipeline workspace:"
-        tree $(Pipeline.Workspace)
-    displayName: 'Display Files'
-    #condition: eq(variables['AGENT.OS'], 'Windows_NT')
-    continueOnError: true
 
-  # Login is needed if you are pulling Bicep files from an Azure Container Registry
-  # -script: az login --service-principal -u $(principalId) -p $(clientSecret) --tenant $(tenantId)
-  #   displayName: 'az login'
-
-  # Note: this task @v6 changed the parameter NAME from targetFiles to sources
-  # - task: qetza.replacetokens.replacetokens-task.replacetokens@6
-  #   displayName: 'Create Parameter File'
-  #   inputs:
-  #     sources: $(parameterFile)
-  #     tokenPrefix: '#{'
-  #     tokenSuffix: '}#'
   - task: qetza.replacetokens.replacetokens-task.replacetokens@5
     displayName: 'Update Parameter File'
     inputs:
@@ -119,26 +122,31 @@ jobs:
         cat  $(parameterFile)
         echo "##[endgroup]"
 
-  - task: AzureCLI@2
-    displayName: 'Create Resource Group'
-    inputs:
-      azureSubscription: $(serviceConnectionName)
-      scriptType: bash
-      scriptLocation: inlineScript
-      inlineScript: az group create --name $(resourceGroupName) --location $(location) --tags LastDeployed=$(runDateTime) Application=$(appName) Environment=$(environmentNameUpper)
+  - ${{ if eq(variables.environmentNameUpper, 'DEV') }}:
+    - template: steps-deploy-bicep-template.yml
+      parameters:
+        serviceConnectionName: $(serviceConnectionDEV)
+        parseBicepOutputs: ${{ parameters.parseBicepOutputs }}
+  - ${{ if eq(variables.environmentNameUpper, 'QA') }}:
+    - template: steps-deploy-bicep-template.yml
+      parameters:
+        serviceConnectionName: $(serviceConnectionQA)
+        parseBicepOutputs: ${{ parameters.parseBicepOutputs }}
+  - ${{ if eq(variables.environmentNameUpper, 'PROD') }}:
+    - template: steps-deploy-bicep-template.yml
+      parameters:
+        serviceConnectionName: $(serviceConnectionPROD)
+        parseBicepOutputs: ${{ parameters.parseBicepOutputs }}
 
-  - task: AzureResourceManagerTemplateDeployment@3
-    displayName: 'Publish Bicep Resources'
+  # Be sure to set the "parseBicepOutputs: true" on the template above to get the outputs
+  - task: CmdLine@2
+    displayName: Display Bicep Outputs
+    continueOnError: true
     inputs:
-      csmFile: $(templateFile)
-      csmParametersFile: $(parameterFile)
-      deploymentScope: 'Resource Group'
-      azureResourceManagerConnection: $(serviceConnectionName)
-      action: 'Create Or Update Resource Group'
-      resourceGroupName: '$(resourceGroupName)'
-      location: '$(location)'
-      templateLocation: 'Linked artifact'
-      deploymentMode: '${{ parameters.deploymentMode }}'  # 'Incremental' | 'Complete' | 'Validation'
+      script: |
+        echo "bicepOutputs: $(bicepOutputs)"
+        echo "bicepOutputs-SUBSCRIPTION_ID:     $(bicepOutputs-SUBSCRIPTION_ID)"
+        echo "bicepOutputs-RESOURCE_GROUP_NAME: $(bicepOutputs-RESOURCE_GROUP_NAME)"
 
   - task: CmdLine@2
     inputs:
