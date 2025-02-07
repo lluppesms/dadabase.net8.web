@@ -179,6 +179,7 @@ resource appServiceMetricLogging 'Microsoft.Insights/diagnosticSettings@2021-05-
 }
 output principalId string = webSiteResource.identity.principalId
 output name string = webSiteName
+output hostName string = webSiteResource.properties.defaultHostName
 output appInsightsName string = appInsightsName
 output appInsightsKey string = appInsightsResource.properties.InstrumentationKey
 // Note: This will give you a warning saying it's not right, but it will contain the right value!

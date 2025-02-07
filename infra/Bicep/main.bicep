@@ -202,4 +202,5 @@ module app 'containerApp.bicep' = if (deployContainerAppEnvironment) {
 
 output SUBSCRIPTION_ID string = subscription().subscriptionId
 output RESOURCE_GROUP_NAME string = resourceGroupName
-output HOST_NAME string = app.outputs.uri
+output HOST_NAME string = webSiteModule.outputs.hostName
+output ACA_HOST_NAME string = deployContainerAppEnvironment ? app.outputs.hostName : ''
