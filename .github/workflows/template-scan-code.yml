@@ -20,6 +20,11 @@ on:
         type: boolean
 
 # ------------------------------------------------------------------------------------------------------------------------
+permissions:
+  contents: write # needed to update the security sarif alerts
+  actions: read
+  pages: write
+
 jobs:
   scanner:
     # MSDO runs on windows-latest. ubuntu-latest and macos-latest supporting coming soon
