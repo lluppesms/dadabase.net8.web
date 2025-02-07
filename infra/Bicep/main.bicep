@@ -137,7 +137,7 @@ module roleAssignments 'identityRoleAssignments.bicep' = if (deployContainerAppE
 // --------------------------------------------------------------------------------------------------------------
 // -- Container Registry ----------------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------------------
-module containerRegistry 'containerregistry.bicep' = if (deployContainerAppEnvironment) {
+module containerRegistry 'containerRegistry.bicep' = if (deployContainerAppEnvironment) {
   name: 'containerregistry${deploymentSuffix}'
   params: {
     existingRegistryName: existing_ACR_Name
@@ -168,7 +168,7 @@ module managedEnvironment 'containerAppEnvironment.bicep' = if (deployContainerA
 // --------------------------------------------------------------------------------------------------------------
 // -- UI Application Definition ---------------------------------------------------------------------------------
 // --------------------------------------------------------------------------------------------------------------
-module app 'containerapp.bicep' = if (deployContainerAppEnvironment) {
+module app 'containerApp.bicep' = if (deployContainerAppEnvironment) {
   name: 'ui-app${deploymentSuffix}'
   params: {
     name: resourceNames.outputs.containerAppUIName
