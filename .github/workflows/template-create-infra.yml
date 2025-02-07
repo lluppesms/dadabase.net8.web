@@ -128,8 +128,9 @@ jobs:
     - name: Display Output
       if: ${{ inputs.runCreateInfra }}
       run: |-
-        echo ${{ steps.deploy-bicep.outputs.resourceToken }}
-        echo ${{ steps.deploy-bicep.outputs.hostName }}
+        echo "Subscription: ${{ steps.deploy-bicep.outputs.SUBSCRIPTION_ID }}"
+        echo "Resource Group: ${{ steps.deploy-bicep.outputs.RESOURCE_GROUP_NAME }}"
+        echo "Host Name: ${{ steps.deploy-bicep.outputs.HOST_NAME }}"
       continue-on-error: true
 
     - name: Write summary
@@ -137,7 +138,7 @@ jobs:
       env:
         SUMMARY: |
           # Deployment summary
-          - Target Resource Group: ${{ env.generatedResourceGroupName }}
-          - Link to App URL: [https://${{ steps.deploy-bicep.outputs.hostName }}](https://${{ steps.deploy-bicep.outputs.hostName }})
+          - Target Resource Group: ${{ steps.deploy-bicep.outputs.RESOURCE_GROUP_NAME }}
+          - Application URL: [https://${{ steps.deploy-bicep.outputs.HOST_NAME }}](https://${{ steps.deploy-bicep.outputs.HOST_NAME }})
       run: echo "$SUMMARY" >> $GITHUB_STEP_SUMMARY
       continue-on-error: true

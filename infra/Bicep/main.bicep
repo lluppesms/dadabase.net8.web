@@ -50,6 +50,7 @@ var commonTags = {
   Environment: environmentCode
 }
 var resourceGroupName = resourceGroup().name
+var resourceToken = toLower(uniqueString(resourceGroup().id, location))
 
 // --------------------------------------------------------------------------------
 module resourceNames 'resourcenames.bicep' = {
@@ -201,3 +202,4 @@ module app 'containerapp.bicep' = if (deployContainerAppEnvironment) {
 
 output SUBSCRIPTION_ID string = subscription().subscriptionId
 output RESOURCE_GROUP_NAME string = resourceGroupName
+output HOST_NAME string = app.outputs.uri
