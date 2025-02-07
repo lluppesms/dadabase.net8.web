@@ -50,7 +50,7 @@ var commonTags = {
   Environment: environmentCode
 }
 var resourceGroupName = resourceGroup().name
-var resourceToken = toLower(uniqueString(resourceGroup().id, location))
+// var resourceToken = toLower(uniqueString(resourceGroup().id, location))
 
 // --------------------------------------------------------------------------------
 module resourceNames 'resourcenames.bicep' = {
