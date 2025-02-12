@@ -80,28 +80,28 @@ jobs:
     continueOnError: true
     inputs:
       script: |
-      echo "environmentName=${{ parameters.environmentName }}"
-      echo "templateFolderName=${{ parameters.templateFolderName }}"
-      echo "templateFileName=${{ parameters.templateFileName }}"
-      echo "templateFile=$(templateFile)"
-      echo "parameterFileName=${{ parameters.parameterFileName }}"
-      echo "parameterFile=$(parameterFile)"
-      echo "deploymentMode=${{ parameters.deploymentMode }}"
-      echo "resourceGroupName=$(resourceGroupName)"
-      echo "appName=$(appName)"
-      echo "appNameLower=$(appNameLower)"
-      echo "appNameLowerNoDashes=$(appNameLowerNoDashes)"
-      echo "runDateTime=$(runDateTime)"
-      echo "runDateTimeZ=$(runDateTimeZ)"
+        echo "environmentName=${{ parameters.environmentName }}"
+        echo "templateFolderName=${{ parameters.templateFolderName }}"
+        echo "templateFileName=${{ parameters.templateFileName }}"
+        echo "templateFile=$(templateFile)"
+        echo "parameterFileName=${{ parameters.parameterFileName }}"
+        echo "parameterFile=$(parameterFile)"
+        echo "deploymentMode=${{ parameters.deploymentMode }}"
+        echo "resourceGroupName=$(resourceGroupName)"
+        echo "appName=$(appName)"
+        echo "appNameLower=$(appNameLower)"
+        echo "appNameLowerNoDashes=$(appNameLowerNoDashes)"
+        echo "runDateTime=$(runDateTime)"
+        echo "runDateTimeZ=$(runDateTimeZ)"
 
-      echo "##[group]Display All Environment Variables:"
-      printenv | sort
-      echo "##[endgroup]"
+        echo "##[group]Display All Environment Variables:"
+        printenv | sort
+        echo "##[endgroup]"
 
-      echo "----------------------------------------"
-      echo "##[group]Directory of pipeline workspace:"
-      tree -L 4 $(Pipeline.Workspace)
-      echo "##[endgroup]"
+        echo "----------------------------------------"
+        echo "##[group]Directory of pipeline workspace:"
+        tree -L 4 $(Pipeline.Workspace)
+        echo "##[endgroup]"
 
     # this script version also works
     # - script: |
