@@ -1,9 +1,8 @@
 # ------------------------------------------------------------------------------------------------------------------------
-# GHA Reusable Called Workflow to run a Playwright Test
+# Reusable Workflow: Run a Playwright Test
 # ------------------------------------------------------------------------------------------------------------------------
 name: z_template_smoke_test
 run-name: Run Smoke Test
-
 on:
   workflow_call:
     inputs:
@@ -21,9 +20,10 @@ on:
         required: false
         type: string
         default: 'ui'
-  
+
+# ------------------------------------------------------------------------------------------------------------------------
 jobs:
-  test:
+  run-smoke-test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
     permissions:
