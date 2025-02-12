@@ -5,6 +5,17 @@ name: $(date:yyyy).$(date:MM).$(date:dd)$(rev:.r)
 pool:
   vmImage: windows-latest
 
+# ------------------------------------------------------------------------------------------------------------------------
+trigger:
+  - none
+
+# schedules:
+# - cron: '0 12 * * 7'
+#   displayName: Scan Every Saturday
+#   branches:
+#     include:
+#     - main
+
 # ----------------------------------------------------------------------------------------------------
 parameters:
   - name: environmentToTest
@@ -16,17 +27,6 @@ parameters:
       - QA
       - PROD
     default: DEMO
-
-# ------------------------------------------------------------------------------------------------------------------------
-trigger:
-  - none
-
-# schedules:
-# - cron: '0 12 * * 7'
-#   displayName: Scan Every Saturday
-#   branches:
-#     include:
-#     - main
 
 # ----------------------------------------------------------------------------------------------------
 variables:

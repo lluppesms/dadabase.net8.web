@@ -5,9 +5,6 @@
 name: $(date:yyyy).$(date:MM).$(date:dd)$(rev:.r)
 pool:
   vmImage: windows-latest
-  #vmImage: ubuntu-latest   # dacpac restore only runs on Windows...?
-
-# ------------------------------------------------------------------------------------------------------------------------
 trigger:
   # since this repo has both AzDO and GHA pipelines, nothing is run automatically...
   - none
