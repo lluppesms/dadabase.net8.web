@@ -125,7 +125,7 @@ module identity 'identity.bicep' = if (deployContainerAppEnvironment) {
     location: location
   }
 }
-module roleAssignments 'identityRoleAssignments.bicep' = if (deployContainerAppEnvironment && addRoleAssignments) {
+module roleAssignments 'role-assignments.bicep' = if (deployContainerAppEnvironment && addRoleAssignments) {
   name: 'identity-access${deploymentSuffix}'
   params: {
     registryName: containerRegistry.outputs.name

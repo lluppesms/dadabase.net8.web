@@ -15,10 +15,10 @@ To create these secrets, customize and run this command::
 ``` bash
 gh auth login
 
-gh secret set AZURE_CLIENT_ID -b "<GUID>"
-gh secret set AZURE_CLIENT_SECRET -b "<GUID>"
-gh secret set AZURE_TENANT_ID -b "<GUID>"
-gh secret set AZURE_SUBSCRIPTION_ID -b "<yourAzureSubscriptionId>"
+gh secret set AZURE_CLIENT_ID -b <GUID>
+gh secret set AZURE_CLIENT_SECRET -b <GUID>
+gh secret set AZURE_TENANT_ID -b <GUID>
+gh secret set AZURE_SUBSCRIPTION_ID -b <yourAzureSubscriptionId>
 ```
 
 ---
