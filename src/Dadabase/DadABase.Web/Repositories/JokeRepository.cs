@@ -54,17 +54,18 @@ public class JokeRepository : BaseRepository, IJokeRepository
     {
         var joke = JokeData.Jokes[Random.Shared.Next(0, JokeData.Jokes.Count)];
         //return joke ?? new Joke("No jokes here!");
-        return (joke == null) ? new Joke("No jokes here!") : new Joke(joke.JokeTxt, joke.JokeCategoryTxt);
-    }
+        return (joke == null) ? new Joke("No jokes here!") : joke;
+		// return (joke == null) ? new Joke("No jokes here!") : new Joke(joke.JokeTxt, joke.JokeCategoryTxt, joke.Attribution);
+	}
 
-    /// <summary>
-    /// Find Matching Jokes by Search Text and Category
-    /// </summary>
-    /// <param name="searchTxt">Search Text</param>
-    /// <param name="jokeCategoryTxt">Category</param>
-    /// <param name="requestingUserName">Requesting UserName</param>
-    /// <returns>Records</returns>
-    public IQueryable<Joke> SearchJokes(string searchTxt = "", string jokeCategoryTxt = "", string requestingUserName = "ANON")
+	/// <summary>
+	/// Find Matching Jokes by Search Text and Category
+	/// </summary>
+	/// <param name="searchTxt">Search Text</param>
+	/// <param name="jokeCategoryTxt">Category</param>
+	/// <param name="requestingUserName">Requesting UserName</param>
+	/// <returns>Records</returns>
+	public IQueryable<Joke> SearchJokes(string searchTxt = "", string jokeCategoryTxt = "", string requestingUserName = "ANON")
     {
         List<string> jokeCategoryList = null;
         jokeCategoryTxt = jokeCategoryTxt.Equals("All", StringComparison.OrdinalIgnoreCase) ? string.Empty : jokeCategoryTxt;

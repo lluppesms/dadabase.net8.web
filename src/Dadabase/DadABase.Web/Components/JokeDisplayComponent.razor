@@ -88,7 +88,7 @@
             myFullText = myJokeText.Replace("?", "?<br/>");
         }
         myFullText = myFullText.Replace("<br/><br/>", "<br/>").Replace("<br/> <br/>", "<br/>").Replace("<br/>  <br/>", "<br/>");
-        myFullText = myFullText.Replace("?<br/>!", "?!").Replace("?<br/>'", "?'").Replace("?<br/>\"", "?\""); ;
+        myFullText = myFullText.Replace("?<br/>!", "?!").Replace("?<br/>'", "?'").Replace("?<br/>\"", "?\"");
         myFullText = myFullText.EndsWith("?<br/>") ? myFullText.Substring(0, myFullText.Length - 5) : myFullText;
         if (!string.IsNullOrEmpty(joke.Attribution))
         {
