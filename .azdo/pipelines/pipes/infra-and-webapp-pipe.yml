@@ -5,10 +5,10 @@ parameters:
 - name: environments
   type: object
   default: ['DEV']
-- name: runGHASScan
-  default: 'false'
 - name: parseBicepOutputs
   default: false
+- name: runGHASScan
+  default: 'false'
 - name: runMSDevSecOpsScan
   default: 'false'
 - name: runUnitTests
