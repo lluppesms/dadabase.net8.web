@@ -30,7 +30,7 @@ Deployment Options include:
 
 [![azd Compatible](/Docs/images/AZD_Compatible.png)](/.azure/readme.md)
 
-[![deploy.infra.and.website](https://github.com/lluppesms/dadabase.blazor.demo/actions/workflows/deploy-infra-website.yml/badge.svg)](https://github.com/lluppesms/dadabase.blazor.demo/actions/workflows/deploy-infra-website.yml) -->
+[![deploy.infra.and.website](https://github.com/lluppesms/dadabase.blazor.demo/actions/workflows/deploy-infra-website.yml/badge.svg)](https://github.com/lluppesms/dadabase.blazor.demo/actions/workflows/deploy-infra-website.yml)
 
 ---
 
