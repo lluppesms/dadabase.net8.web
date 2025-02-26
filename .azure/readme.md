@@ -14,35 +14,6 @@ This application requires a few secrets to be configured in the application befo
 
 > *Note 2: the first time you run the azd command, you will be prompted for the Environment Name, Azure Subscription and Azure Region to use -- see section below for information on choosing a good Environment Name.*
 
-The two key things that are required for this demo are the name of an **existing Azure OpenAI Resource**, and the **API Key** for that resource. You can set them by running the following commands.
-
-```bash
-    azd env set openAIResourceName <yourOpenAIAzureResourceName>
-    azd env set openAIApiKey <yourOpenAIApiKey>
-    azd env set dallEApiKey <yourDallEApiKey>
-```
-
-The SQL Server needs an Azure AD account to specify as the administrator of the SQL Server:
-
-```bash
-    azd env set adminLoginTenantId <yourTenantId>
-    azd env set adminLoginUserId <yourUser@yourDomain.com>
-    azd env set adminLoginUserSid <yourUserSID>
-```
-
-If you want your application to be authenticated, you will need to provide a Domain, TenantId and ClientId.  This is optional and only needed if you want to enable authentication.  If not specified, then anyone will be able to use the application, which would be fine if you are just doing a local demo. These values should point to an Azure Active Directory App Registration that is used to authorized this application. To add these values to the application, run the following commands:
-
-```bash
-    azd env set adDomain <yourDomain.onmicrosoft.com>
-    azd env set adTenantId <yourTenantId>
-    azd env set adClientId <yourClientId>
-```
-
-In order for the authentication to work properly, the App Registration Authentication Page will have to be updated to include the Redirect URI for local development and Azure deployment of the application. The Redirect URIs should look something like:
-
-- `https://localhost:7078/signin-oidc`
-- `https://xxx-chatgpt.azurewebsites.net/signin-oidc`
-
 ---
 
 ## Environment Names
