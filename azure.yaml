@@ -13,6 +13,6 @@ pipeline:
 
 services:
   web:
-    project: ./src/DadABase.Web/
+    project: ./src/Dadabase/DadABase.Web/
     language: csharp
     host: appservice
