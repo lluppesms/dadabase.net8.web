@@ -9,19 +9,12 @@
 // ----------------------------------------------------------------------------------------------------
 param name string
 param location string
-param principalId string = ''
 param runDateTime string = utcNow()
 
 // CUSTOM PARAMETERS: ---------------------------------------------------------------------------------
-param openAIApiKey string = ''
-param openAIResourceName string = ''
-param dallEApiKey string = ''
 param adDomain string = ''
 param adTenantId string = ''
 param adClientId string = ''
-param adminLoginTenantId string = ''
-param adminLoginUserId string = ''
-param adminLoginUserSid string = ''
 
 // --------------------------------------------------------------------------------
 targetScope = 'subscription'
@@ -47,16 +40,9 @@ module resources './Bicep/main.bicep' = {
     params: {
         location: location
         appName: name
-        keyVaultOwnerUserId: principalId
         environmentCode: 'azd'
-        openAIApiKey: openAIApiKey
-        openAIResourceName: openAIResourceName
-        dallEApiKey: dallEApiKey
         adDomain: adDomain
         adTenantId: adTenantId
         adClientId: adClientId
-        adminLoginTenantId: adminLoginTenantId
-        adminLoginUserId: adminLoginUserId
-        adminLoginUserSid: adminLoginUserSid
     }
 }
