@@ -42,18 +42,6 @@ resource appInsightsResource 'Microsoft.Insights/components@2020-02-02' = {
 resource appServiceResource 'Microsoft.Web/serverfarms@2023-01-01' existing = {
   name: appServicePlanName
 }
-// resource appServiceResource 'Microsoft.Web/serverfarms@2023-01-01' = {
-//   name: appServicePlanName
-//   location: location
-//   tags: tags
-//   sku: {
-//     name: sku
-//   }
-//   kind: webAppKind
-//   properties: {
-//     reserved: true
-//   }
-// }
 
 resource webSiteResource 'Microsoft.Web/sites@2023-01-01' = {
   name: webSiteName
