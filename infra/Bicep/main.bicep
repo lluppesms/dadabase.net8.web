@@ -89,6 +89,7 @@ module appServicePlanModule 'websiteserviceplan.bicep' = {
     environmentCode: environmentCode
     appServicePlanName: servicePlanName == '' ? resourceNames.outputs.webSiteAppServicePlanName : servicePlanName
     existingServicePlanName: servicePlanName
+    webAppKind: webAppKind
   }
 }
 
