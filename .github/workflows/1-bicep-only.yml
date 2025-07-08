@@ -37,6 +37,7 @@ permissions:
   actions: read
   pages: write
   security-events: write
+  checks: write
 
 # ------------------------------------------------------------------------------------------------------------------------
 jobs:
