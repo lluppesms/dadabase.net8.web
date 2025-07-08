@@ -80,6 +80,19 @@ module storageModule 'storageaccount.bicep' = {
   }
 }
 
+module appServicePlanModule 'websiteserviceplan.bicep' = {
+  name: 'appService${deploymentSuffix}'
+  params: {
+    location: location
+    commonTags: commonTags
+    sku: webSiteSku
+    environmentCode: environmentCode
+    appServicePlanName: servicePlanName == '' ? resourceNames.outputs.webSiteAppServicePlanName : servicePlanName
+    existingServicePlanName: servicePlanName
+  }
+}
+
+
 module webSiteModule 'website.bicep' = {
   name: 'webSite${deploymentSuffix}'
   params: {
@@ -87,11 +100,9 @@ module webSiteModule 'website.bicep' = {
     location: location
     appInsightsLocation: location
     commonTags: commonTags
-    sku: webSiteSku
     environmentCode: environmentCode
     workspaceId: logAnalyticsWorkspaceModule.outputs.id
-    appServicePlanName: servicePlanName == '' ? resourceNames.outputs.webSiteAppServicePlanName : servicePlanName
-    webAppKind: webAppKind
+    appServicePlanName: appServicePlanModule.outputs.name
   }
 }
 
