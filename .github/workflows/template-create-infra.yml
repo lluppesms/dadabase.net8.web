@@ -39,10 +39,6 @@ on:
         description: Create Resource Group?
         type: boolean
         default: false
-      addRoleAssignments:
-        description: Add Role Assignments?
-        type: boolean
-        default: true
       requestorName:
         description: Requestor Name
         type: string
@@ -74,7 +70,6 @@ jobs:
       generatedAppEnvName: ${{ vars.APP_NAME }}-${{ inputs.envCode }}
       generatedResourceGroupName: ${{ vars.RESOURCE_GROUP_NAME || format('{0}-{1}', vars.RESOURCE_GROUP_PREFIX, inputs.envCode) }}
       createResourceGroup: ${{ inputs.createResourceGroup }}
-      addRoleAssignments: ${{ inputs.addRoleAssignments }}
       requestorName: ${{ inputs.requestorName }}
 
     # ------------------------------------------------------------------------------------------------------------------------

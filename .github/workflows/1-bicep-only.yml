@@ -25,10 +25,6 @@ on:
         description: Create Resource Group?
         type: boolean
         default: false
-      addRoleAssignments:
-        description: Add Role Assignments?
-        type: boolean
-        default: true
       runSecurityScan:
         description: Run Security Scan
         type: boolean
@@ -69,5 +65,4 @@ jobs:
       parameterFileReplaceTokens: 'true'
       requestorName: ${{ github.actor }}
       createResourceGroup: ${{ inputs.createResourceGroup }}
-      addRoleAssignments: ${{ inputs.addRoleAssignments }}
       bicepDeploymentMode: ${{ inputs.bicepDeploymentMode }}
