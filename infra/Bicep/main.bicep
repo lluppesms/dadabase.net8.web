@@ -24,6 +24,7 @@ param adCallbackPath string = '/signin-oidc'
 param appDataSource string = 'JSON'
 param appSwaggerEnabled string = 'true'
 param servicePlanName string = ''
+param webAppKind string = 'linux' // 'linux' or 'windows'
 
 // @description('Admin IP Address to add to Key Vault and Container Registry?')
 // param myIpAddress string = ''
@@ -90,6 +91,7 @@ module webSiteModule 'website.bicep' = {
     environmentCode: environmentCode
     workspaceId: logAnalyticsWorkspaceModule.outputs.id
     appServicePlanName: servicePlanName == '' ? resourceNames.outputs.webSiteAppServicePlanName : servicePlanName
+    webAppKind: webAppKind
   }
 }
 
