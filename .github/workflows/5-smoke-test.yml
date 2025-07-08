@@ -9,16 +9,12 @@ on:
   workflow_dispatch:
     inputs:
       deployEnvironment:
-        description: 'Environment'
+        description: Environment
         required: true
         default: 'dev' 
-        type: choice
-        options:
-          - dev
-          - qa
-          - prod
+        type: environment
       logLevel:
-        description: 'Log level'
+        description: Log level
         required: false
         default: 'warning' 
         type: choice
