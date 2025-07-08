@@ -42,6 +42,8 @@ permissions:
   pages: write
   security-events: write
   checks: write
+  issues: read
+  pull-requests: read
 
 # ------------------------------------------------------------------------------------------------------------------------
 jobs:

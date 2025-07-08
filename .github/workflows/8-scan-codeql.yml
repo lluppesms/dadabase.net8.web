@@ -2,6 +2,7 @@
 # GHA Workflow to Run CodeQL Scan on a schedule
 # ------------------------------------------------------------------------------------------------------------------------
 name: 8.scan.codeQL.scheduled
+run-name: '8 - Scheduled CodeQL Scan'
 
 on:
   workflow_dispatch:
@@ -20,6 +21,8 @@ permissions:
   actions: read
   pages: write
   security-events: write
+  issues: read
+  pull-requests: read
 
 # ------------------------------------------------------------------------------------------------------------------------
 jobs:

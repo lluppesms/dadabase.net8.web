@@ -2,6 +2,7 @@
 # GHA Workflow to Scan Bicep on a schedule
 # ------------------------------------------------------------------------------------------------------------------------
 name: 7.scan.devsecops.scheduled
+run-name: '7 - Scheduled Scan'
 
 on:
   workflow_dispatch:
@@ -16,6 +17,8 @@ permissions:
   actions: read
   pages: write
   security-events: write
+  issues: read
+  pull-requests: read
 
 # ------------------------------------------------------------------------------------------------------------------------
 jobs:
