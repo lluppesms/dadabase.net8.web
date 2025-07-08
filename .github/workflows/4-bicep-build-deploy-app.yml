@@ -57,6 +57,8 @@ permissions:
   pages: write
   security-events: write
   checks: write
+  issues: read
+  pull-requests: read
 
 # ------------------------------------------------------------------------------------------------------------------------
 jobs:
@@ -74,11 +76,6 @@ jobs:
     uses: ./.github/workflows/template-create-infra.yml
     if: inputs.runCreateInfra || inputs.runBuildDeploy
     secrets: inherit
-    permissions:
-      id-token: write
-      contents: read
-      actions: read
-      pages: write
     with:
       envCode: ${{ inputs.deployEnvironment }}
       templatePath: './infra/Bicep/'
