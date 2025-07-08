@@ -2,7 +2,7 @@
 // Bicep file that builds all the resource names used by other Bicep templates
 // --------------------------------------------------------------------------------
 param appName string = ''
-@allowed(['azd','gha','azdo','dev','demo','qa','stg','ct','prod'])
+// @allowed(['azd','gha','azdo','dev','demo','qa','stg','ct','prod'])
 param environmentCode string = 'azd'
 
 // --------------------------------------------------------------------------------
