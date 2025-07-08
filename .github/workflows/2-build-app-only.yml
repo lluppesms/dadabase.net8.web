@@ -4,6 +4,7 @@
 # FYI: You need to set up some secrets before running this workflows - see CreateGitHubSecrets.md for details.
 # ------------------------------------------------------------------------------------------------------------------------
 name: 2.build.app.only
+run-name: '2 - Build App by @${{ github.actor }}'
 
 on:
   workflow_dispatch:
@@ -11,11 +12,8 @@ on:
       runSecurityScan:
         description: 'Run Security Scan'
         required: false
-        default: 'false'
-        type: choice
-        options:
-          - true
-          - false
+        default: false
+        type: boolean
       logLevel:
         description: 'Log level'
         required: false
@@ -25,15 +23,26 @@ on:
           - info
           - warning
           - debug 
-
-jobs:
 # ------------------------------------------------------------------------------------------------------------------------
+permissions:
+  id-token: write
+  contents: write
+  actions: read
+  pages: write
+  security-events: write
+  checks: write
+  issues: read
+  pull-requests: read
+
+# ------------------------------------------------------------------------------------------------------------------------
+jobs:
   scan-code:
     name: Scan Source Code
     uses: ./.github/workflows/template-scan-code.yml
     secrets: inherit
+    if: inputs.runSecurityScan
     with:
-      runSecurityScan: ${{ inputs.runSecurityScan == 'true' }}
+      runSecurityScan: ${{ inputs.runSecurityScan }}
 
 # ------------------------------------------------------------------------------------------------------------------------
   build-app:

@@ -4,21 +4,18 @@
 # FYI: You need to set up some secrets before running this workflows - see CreateGitHubSecrets.md for details.
 # ------------------------------------------------------------------------------------------------------------------------
 name: 5.smoke.test
+run-name: '5 - Smoke Test by @${{ github.actor }} using ENV ${{ inputs.deployEnvironment }} '
 
 on:
   workflow_dispatch:
     inputs:
       deployEnvironment:
-        description: 'Environment'
+        description: Environment
         required: true
         default: 'dev' 
-        type: choice
-        options:
-          - dev
-          - qa
-          - prod
+        type: environment
       logLevel:
-        description: 'Log level'
+        description: Log level
         required: false
         default: 'warning' 
         type: choice

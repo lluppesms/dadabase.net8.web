@@ -23,6 +23,8 @@ param adCallbackPath string = '/signin-oidc'
 
 param appDataSource string = 'JSON'
 param appSwaggerEnabled string = 'true'
+param servicePlanName string = ''
+param webAppKind string = 'linux' // 'linux' or 'windows'
 
 // @description('Admin IP Address to add to Key Vault and Container Registry?')
 // param myIpAddress string = ''
@@ -78,6 +80,20 @@ module storageModule 'storageaccount.bicep' = {
   }
 }
 
+module appServicePlanModule 'websiteserviceplan.bicep' = {
+  name: 'appService${deploymentSuffix}'
+  params: {
+    location: location
+    commonTags: commonTags
+    sku: webSiteSku
+    environmentCode: environmentCode
+    appServicePlanName: servicePlanName == '' ? resourceNames.outputs.webSiteAppServicePlanName : servicePlanName
+    existingServicePlanName: servicePlanName
+    webAppKind: webAppKind
+  }
+}
+
+
 module webSiteModule 'website.bicep' = {
   name: 'webSite${deploymentSuffix}'
   params: {
@@ -85,9 +101,10 @@ module webSiteModule 'website.bicep' = {
     location: location
     appInsightsLocation: location
     commonTags: commonTags
-    sku: webSiteSku
     environmentCode: environmentCode
+    webAppKind: webAppKind
     workspaceId: logAnalyticsWorkspaceModule.outputs.id
+    appServicePlanName: appServicePlanModule.outputs.name
   }
 }
 

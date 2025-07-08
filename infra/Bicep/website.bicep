@@ -6,11 +6,13 @@ param location string = resourceGroup().location
 param appInsightsLocation string = resourceGroup().location
 param environmentCode string = 'dev'
 param commonTags object = {}
-@allowed(['F1','B1','B2','S1','S2','S3'])
-param sku string = 'B1'
 
 @description('The workspace to store audit logs.')
 param workspaceId string = ''
+
+@description('The Name of the service plan to deploy into.')
+param appServicePlanName string
+param webAppKind string = 'linux'
 
 // --------------------------------------------------------------------------------
 var templateTag = { TemplateFile: '~website.bicep'}
@@ -19,9 +21,7 @@ var tags = union(commonTags, templateTag)
 var webSiteTags = union(commonTags, templateTag, azdTag)
 
 // --------------------------------------------------------------------------------
-var linuxFxVersion = 'DOTNETCORE|8.0' // 	The runtime stack of web app
-var webAppKind = 'linux'
-var appServicePlanName = toLower('${webSiteName}-appsvc')
+var linuxFxVersion = webAppKind == 'linux' ? 'DOTNETCORE|8.0' : '' // 	The runtime stack of web app
 var appInsightsName = toLower('${webSiteName}-insights')
 
 // --------------------------------------------------------------------------------
@@ -39,17 +39,8 @@ resource appInsightsResource 'Microsoft.Insights/components@2020-02-02' = {
   }
 }
 
-resource appServiceResource 'Microsoft.Web/serverfarms@2023-01-01' = {
+resource appServiceResource 'Microsoft.Web/serverfarms@2023-01-01' existing = {
   name: appServicePlanName
-  location: location
-  tags: tags
-  sku: {
-    name: sku
-  }
-  kind: webAppKind
-  properties: {
-    reserved: true
-  }
 }
 
 resource webSiteResource 'Microsoft.Web/sites@2023-01-01' = {

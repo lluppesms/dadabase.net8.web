@@ -4,53 +4,44 @@
 # FYI: You need to set up some secrets before running this workflows - see CreateGitHubSecrets.md for details.
 # ------------------------------------------------------------------------------------------------------------------------
 name: 4.bicep.build.deploy.app
+run-name: '4 - Deploy Bicep/Build & Deploy App: ${{ inputs.bicepDeploymentMode }} using ENV ${{ inputs.deployEnvironment }} by @${{ github.actor }}'
 
 on: 
   workflow_dispatch:
     inputs:
       deployEnvironment:
-        description: 'Environment'
-        required: true
+        description: Environment
         default: 'dev' 
-        type: choice
-        options:
-          - dev
-          - qa
-          - prod
+        type: environment
       runSecurityScan:
-        description: 'Run Security Scan'
-        required: false
-        default: 'false'
-        type: choice
-        options:
-          - true
-          - false
+        description: Run Security Scan
+        default: false
+        type: boolean
       runCreateInfra:
-        description: 'Deploy Bicep'
-        required: false
-        default: 'true'
+        description: Deploy Bicep
+        default: true
+        type: boolean
+      bicepDeploymentMode:
+        description: Bicep Mode
+        default: create
         type: choice
         options:
-          - true
-          - false
+          - create
+          - whatIf
+      createResourceGroup:
+        description: Create Resource Group?
+        type: boolean
+        default: false
       runBuildDeploy:
-        description: 'Build and Deploy App'
-        required: false
-        default: 'true'
-        type: choice
-        options:
-          - true
-          - false
+        description: Build and Deploy App
+        default: true
+        type: boolean
       runSmokeTest:
-        description: 'Run Smoke Tests'
-        required: false
-        default: 'true'
-        type: choice
-        options:
-          - true
-          - false
+        description: Run Smoke Tests
+        default: false
+        type: boolean
       logLevel:
-        description: 'Log level'
+        description: Log level
         required: false
         default: 'warning' 
         type: choice
@@ -62,10 +53,13 @@ on:
 # ------------------------------------------------------------------------------------------------------------------------
 permissions:
   id-token: write
-  contents: read
+  contents: write
   actions: read
   pages: write
   security-events: write
+  checks: write
+  issues: read
+  pull-requests: read
 
 # ------------------------------------------------------------------------------------------------------------------------
 jobs:
@@ -73,14 +67,15 @@ jobs:
     name: Scan Source Code
     uses: ./.github/workflows/template-scan-code.yml
     secrets: inherit
+    if: inputs.runSecurityScan
     with:
-      runSecurityScan: ${{ inputs.runSecurityScan == 'true' }}
+      runSecurityScan: ${{ inputs.runSecurityScan }}
 
   # ------------------------------------------------------------------------------------------------------------------------
   create-infra:
     name: Create Infra ${{ inputs.deployEnvironment }}
     uses: ./.github/workflows/template-create-infra.yml
-    if: inputs.runCreateInfra == 'true' || inputs.runBuildDeploy == 'true'
+    if: inputs.runCreateInfra || inputs.runBuildDeploy
     secrets: inherit
     with:
       envCode: ${{ inputs.deployEnvironment }}
@@ -88,13 +83,15 @@ jobs:
       templateFile: 'main.bicep'
       parameterFile: 'main.parameters.gha.bicepparam'
       parameterFileReplaceTokens: 'true'
-      runCreateInfra: ${{ inputs.runCreateInfra == 'true' }}
+      requestorName: ${{ github.actor }}
+      createResourceGroup: ${{ inputs.createResourceGroup }}
+      bicepDeploymentMode: ${{ inputs.bicepDeploymentMode }}
 
 # ------------------------------------------------------------------------------------------------------------------------
   build-app:
     name: Build WebApp
     uses: ./.github/workflows/template-webapp-build.yml
-    if: inputs.runBuildDeploy == 'true' || inputs.runSmokeTest == 'true'
+    if: inputs.runBuildDeploy|| inputs.runSmokeTest
     needs: create-infra
     secrets: inherit
     with:
@@ -110,7 +107,7 @@ jobs:
   deploy-app:
     name: Deploy WebApp ${{ inputs.deployEnvironment }}
     uses: ./.github/workflows/template-webapp-deploy.yml
-    if: inputs.runBuildDeploy == 'true' || inputs.runSmokeTest == 'true'
+    if: inputs.runBuildDeploy || inputs.runSmokeTest
     needs: build-app
     secrets: inherit
     with:
@@ -121,7 +118,7 @@ jobs:
   run-smoke-test:
     name: Smoke Test ${{ inputs.deployEnvironment }}
     uses: ./.github/workflows/template-smoke-test.yml
-    if: inputs.runSmokeTest == 'true'
+    if: inputs.runSmokeTest
     needs: deploy-app
     secrets: inherit
     with:
