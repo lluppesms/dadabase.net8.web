@@ -60,7 +60,7 @@ public class BaseAPIController : ControllerBase
                     .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.JokeCategoryTxt));
                 cfg.CreateMap<JokeCategory, CategoryBasic>()
                     .ForMember(dest => dest.Category, opt => opt.MapFrom(src => src.JokeCategoryTxt));
-            });
+            }, new LoggerFactory());
             mapperConfig.AssertConfigurationIsValid();
             iMapper = mapperConfig.CreateMapper();
         }
