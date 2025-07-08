@@ -24,11 +24,11 @@ on:
       createResourceGroup:
         description: Create Resource Group?
         type: boolean
-        default: true
+        default: false
       runSecurityScan:
         description: Run Security Scan
         type: boolean
-        default: true
+        default: false
 
 # ------------------------------------------------------------------------------------------------------------------------
 permissions:
