@@ -3,37 +3,36 @@
 # ------------------------------------------------------------------------------------------------------------------------
 # FYI: You need to set up some secrets before running this workflows - see CreateGitHubSecrets.md for details.
 # ------------------------------------------------------------------------------------------------------------------------
-name: 1.bicep.only
+name: 1 - Deploy Infrastructure
+run-name: '1 - Deploy Infra: ${{ inputs.bicepDeploymentMode }} to ENV ${{ inputs.deployEnvironment }} by @${{ github.actor }}'
 
 on: 
   workflow_dispatch:
     inputs:
       deployEnvironment:
-        description: 'Environment'
+        description: Environment
         required: true
         default: 'dev' 
+        type: environment
+      bicepDeploymentMode:
+        description: Bicep Mode
+        default: create
         type: choice
         options:
-          - dev
-          - qa
-          - prod
+          - create
+          - whatIf
+      createResourceGroup:
+        description: Create Resource Group?
+        type: boolean
+        default: false
+      addRoleAssignments:
+        description: Add Role Assignments?
+        type: boolean
+        default: true
       runSecurityScan:
-        description: 'Run Security Scan'
-        required: false
-        default: 'false'
-        type: choice
-        options:
-          - true
-          - false
-      logLevel:
-        description: 'Log level'
-        required: false
-        default: 'warning' 
-        type: choice
-        options:
-          - info
-          - warning
-          - debug 
+        description: Run Security Scan
+        type: boolean
+        default: false
 
 # ------------------------------------------------------------------------------------------------------------------------
 permissions:
@@ -50,16 +49,25 @@ jobs:
     uses: ./.github/workflows/template-scan-code.yml
     secrets: inherit
     with:
-      runSecurityScan: ${{ inputs.runSecurityScan == 'true' }}
+      runSecurityScan: ${{ inputs.runSecurityScan }}
 
 # ------------------------------------------------------------------------------------------------------------------------
-  create-infra:
-    name: Create Infra ${{ inputs.deployEnvironment }}
+  Deploy_Bicep:
+    name: Deploy ${{ inputs.deployEnvironment }} Bicep (${{ inputs.bicepDeploymentMode }})
     uses: ./.github/workflows/template-create-infra.yml
     secrets: inherit
+    permissions:
+      id-token: write
+      contents: read
+      actions: read
+      pages: write
     with:
       envCode: ${{ inputs.deployEnvironment }}
       templatePath: './infra/Bicep/'
       templateFile: 'main.bicep'
       parameterFile: 'main.parameters.gha.bicepparam'
       parameterFileReplaceTokens: 'true'
+      requestorName: ${{ github.actor }}
+      createResourceGroup: ${{ inputs.createResourceGroup }}
+      addRoleAssignments: ${{ inputs.addRoleAssignments }}
+      bicepDeploymentMode: ${{ inputs.bicepDeploymentMode }}

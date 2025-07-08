@@ -12,6 +12,9 @@ param sku string = 'B1'
 @description('The workspace to store audit logs.')
 param workspaceId string = ''
 
+@description('The name of the service plan to deploy into.')
+param appServicePlanName string = toLower('${webSiteName}-appsvc')
+
 // --------------------------------------------------------------------------------
 var templateTag = { TemplateFile: '~website.bicep'}
 var azdTag = environmentCode == 'azd' ? { 'azd-service-name': 'web' } : {}
@@ -21,7 +24,6 @@ var webSiteTags = union(commonTags, templateTag, azdTag)
 // --------------------------------------------------------------------------------
 var linuxFxVersion = 'DOTNETCORE|8.0' // 	The runtime stack of web app
 var webAppKind = 'linux'
-var appServicePlanName = toLower('${webSiteName}-appsvc')
 var appInsightsName = toLower('${webSiteName}-insights')
 
 // --------------------------------------------------------------------------------

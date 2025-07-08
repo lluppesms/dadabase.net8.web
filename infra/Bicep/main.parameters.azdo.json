@@ -12,6 +12,8 @@
 
     "apiKey": { "value": "#{apiKey}#" },
 
-    "location": { "value": "#{location}#" }
+    "location": { "value": "#{location}#" },
+    
+    "servicePlanName": { "value": "#{servicePlanName}#" }
   }
 }
