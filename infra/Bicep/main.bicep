@@ -102,6 +102,7 @@ module webSiteModule 'website.bicep' = {
     appInsightsLocation: location
     commonTags: commonTags
     environmentCode: environmentCode
+    webAppKind: webAppKind
     workspaceId: logAnalyticsWorkspaceModule.outputs.id
     appServicePlanName: appServicePlanModule.outputs.name
   }
