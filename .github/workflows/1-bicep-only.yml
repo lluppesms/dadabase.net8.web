@@ -4,7 +4,7 @@
 # FYI: You need to set up some secrets before running this workflows - see CreateGitHubSecrets.md for details.
 # ------------------------------------------------------------------------------------------------------------------------
 name: 1 - Deploy Infrastructure
-run-name: '1 - Deploy Infra: ${{ inputs.bicepDeploymentMode }} to ENV ${{ inputs.deployEnvironment }} by @${{ github.actor }}'
+run-name: '1 - Deploy Infra: ${{ inputs.bicepDeploymentMode }} from ENV ${{ inputs.deployEnvironment }} by @${{ github.actor }}'
 
 on: 
   workflow_dispatch:
@@ -33,7 +33,7 @@ on:
 # ------------------------------------------------------------------------------------------------------------------------
 permissions:
   id-token: write
-  contents: read
+  contents: write
   actions: read
   pages: write
   security-events: write
