@@ -45,6 +45,7 @@ jobs:
     name: Scan Source Code
     uses: ./.github/workflows/template-scan-code.yml
     secrets: inherit
+    if: inputs.runSecurityScan
     with:
       runSecurityScan: ${{ inputs.runSecurityScan }}
 
