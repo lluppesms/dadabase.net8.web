@@ -10,8 +10,7 @@ import { defineConfig, devices } from '@playwright/test';
  * See https://playwright.dev/docs/test-configuration.
  */
 export default defineConfig({
-  //testDir: './playwright/ui-tests',
-  testDir: './playwright/api-tests',
+  testDir: './playwright',
 
   /* Run tests in files in parallel */
   fullyParallel: true,
@@ -43,7 +42,8 @@ export default defineConfig({
   /* Shared settings for all the projects below. See https://playwright.dev/docs/api/class-testoptions. */
   use: {
     /* Base URL to use in actions like `await page.goto('/')`. */
-    baseURL: 'https://localhost:44349/',
+    baseURL: 'https://dadabase.luppes.com',
+    //baseURL: 'https://localhost:44349/',
     //baseURL: 'http://lll-dadabase-web-demo.azurewebsites.net/',
 
     // baseURL: process.env.CI ? 
