@@ -44,6 +44,7 @@ permissions:
   checks: write
   issues: read
   pull-requests: read
+  packages: read
 
 # ------------------------------------------------------------------------------------------------------------------------
 jobs:
