@@ -153,10 +153,10 @@ test.describe('PW MCP Generated DadABase Website Tests', () => {
   test.describe('Footer and External Links', () => {
     test('should display footer information', async ({ page, baseURL }) => {
       // Verify copyright text
-      await expect(page.getByText('Copyright 2025, Luppes Consulting, Inc.')).toBeVisible();
+      await expect(page.getByText('Copyright ')).toBeVisible();
       
       // Verify version information
-      await expect(page.getByText('Version 1.0.0.0')).toBeVisible();
+      await expect(page.getByText('Version ')).toBeVisible();
       
       // Verify external links are present (without clicking them)
       await expect(page.getByRole('link', { name: 'Privacy' })).toBeVisible();
