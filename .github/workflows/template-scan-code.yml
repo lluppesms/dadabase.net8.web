@@ -27,7 +27,7 @@ on:
 jobs:
   ms-devsecops-scanner:
     # MSDO runs on windows-latest. ubuntu-latest and macos-latest supporting coming soon
-    name: Security Scan
+    name: MS DevSecOps Scan
     runs-on: windows-latest
     if: inputs.runMSDevSecOpsScan
     permissions:
@@ -56,10 +56,11 @@ jobs:
       uses: microsoft/security-devops-action@release/vNext
       id: msdo
       # For settings, see: https://github.com/microsoft/security-devops-action/wiki
+      # Trying to get this to make the step fail if scan fails, but it's not working...
       env:
         RUN_RICHEXITCODE: true
-      with:
-        tools: templateanalyzer,terrascan,trivy
+      # with:
+      #   tools: templateanalyzer,terrascan,trivy
 
     - name: Upload MS SecDevOps alerts to Security tab
       if: inputs.runMSDevSecOpsScan
@@ -75,8 +76,9 @@ jobs:
         name: alerts
         path: ${{ steps.msdo.outputs.sarifFile }}
 
+  # ------------------------------------------------------------------------------------------------------------------------
   codeql-scanner:
-    name: Analyze (${{ matrix.language }})
+    name: GHAS Scan Analyze (${{ matrix.language }})
     if: inputs.runGHASScan
     runs-on: ${{ (matrix.language == 'swift' && 'macos-latest') || 'ubuntu-latest' }}
     # Runner size impacts CodeQL analysis time. To learn more, please see:
