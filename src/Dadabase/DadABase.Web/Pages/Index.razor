@@ -10,7 +10,39 @@
             </ul>
         </LoadingIndicator>
         <button class="btn btn-primary" @onclick="ExecuteRandom" style="margin-top: 40px;">Tell me another one!</button>
+        @if (jokeHistory.Any())
+        {
+            <div style="margin-top: 40px;">
+                <h5 style="display: flex; align-items: center; cursor: pointer; user-select: none; font-size: 1rem;"
+                    tabindex="0"
+                    @onclick="ToggleHistory"
+                    @onkeydown="@(e => { if (e.Key == "Enter" || e.Key == " ") ToggleHistory(); })">
+                    Joke History
+                    <span style="margin-left: 8px; font-size: 1.2em;">
+                        @(isHistoryCollapsed ? "👁️" : "🙈")
+                    </span>
+                </h5>
+                @if (!isHistoryCollapsed)
+                {
+                    <ul style="list-style-type: none; padding-left: 0;">
+                        @foreach (var joke in jokeHistory)
+                        {
+                            <li><JokeDisplayComponent myJoke="@joke" /></li>
+                        }
+                    </ul>
+                }
+            </div>
+        }
     </Column>
 
 </Row>
 <SnackbarStack @ref="snackbarstack" Location="SnackbarStackLocation.BottomEnd" />
+
+@code {
+    private bool isHistoryCollapsed = true;
+
+    private void ToggleHistory()
+    {
+        isHistoryCollapsed = !isHistoryCollapsed;
+    }
+}

@@ -7,6 +7,7 @@
 // </summary>
 //-----------------------------------------------------------------------
 using Microsoft.AspNetCore.Authorization;
+using System.Collections.Generic;
 
 namespace DadABase.Web.Pages;
 
@@ -23,6 +24,9 @@ public partial class Index : ComponentBase
     private readonly bool addDelay = false;
     private LoadingIndicator jokeLoadingIndicator;
     private SnackbarStack snackbarstack;
+
+    // Store the last 10 jokes
+    private List<Joke> jokeHistory = new();
 
     /// <summary>
     /// Initialization
@@ -46,6 +50,13 @@ public partial class Index : ComponentBase
         var timer = Stopwatch.StartNew();
         if (addDelay) { await Task.Delay(500).ConfigureAwait(false); } // I want to see the spinners for now...
         myJoke = JokeRepository.GetRandomJoke();
+        // Add to history, but skip if duplicate of last
+        if (jokeHistory.Count == 0 || jokeHistory[0].JokeTxt != myJoke.JokeTxt)
+        {
+            jokeHistory.Insert(0, myJoke);
+            if (jokeHistory.Count > 10)
+                jokeHistory.RemoveAt(jokeHistory.Count - 1);
+        }
         var elaspsedMS = timer.ElapsedMilliseconds;
         await jokeLoadingIndicator.Hide().ConfigureAwait(false);
         await snackbarstack.PushAsync($"Joke Elapsed: {(decimal)elaspsedMS / 1000m:0.0} seconds", SnackbarColor.Info).ConfigureAwait(false);
