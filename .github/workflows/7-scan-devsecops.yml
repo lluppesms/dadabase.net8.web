@@ -6,7 +6,12 @@ run-name: '7 - Scheduled Scan'
 
 on:
   workflow_dispatch:
-  # run this once a month on the 1st day of the month
+  push:
+    branches: [ "main" ]
+  pull_request:
+    branches: [ "main" ]
+
+  # run this once a month on the 1st day of the month even if no pushes or PRs
   schedule:
     - cron: '0 0 1 * *'
   

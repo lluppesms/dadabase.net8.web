@@ -6,11 +6,12 @@ run-name: '8 - Scheduled CodeQL Scan'
 
 on:
   workflow_dispatch:
-  # push:
-  #   branches: [ "main" ]
+  push:
+    branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
-  # run this once a month on the 1st day of the month
+
+  # run this once a month on the 1st day of the month even if no pushes or PRs
   schedule:
     - cron: '0 0 1 * *'
 
