@@ -50,7 +50,7 @@ jobs:
         dotnet-version: |
           8.0.x
 
-    - name: Run Full Infra Scan
+    - name: Run MS DevSecOps Scan
       if: inputs.runMSDevSecOpsScan
       continue-on-error: ${{ inputs.continueOnScanError }}
       uses: microsoft/security-devops-action@release/vNext
@@ -62,14 +62,14 @@ jobs:
       # with:
       #   tools: templateanalyzer,terrascan,trivy
 
-    - name: Upload MS SecDevOps alerts to Security tab
+    - name: Upload MS DevSecOps alerts to Security tab
       if: inputs.runMSDevSecOpsScan
       continue-on-error: true
       uses: github/codeql-action/upload-sarif@v3
       with:
         sarif_file: ${{ steps.msdo.outputs.sarifFile }}
  
-    - name: Upload MS SecDevOps alerts to Workflow Artifacts
+    - name: Upload MS DevSecOps alerts to Workflow Artifacts
       if: inputs.runMSDevSecOpsScan
       uses: actions/upload-artifact@v4
       with:
