@@ -9,6 +9,18 @@ updates:
     directory: "/src/Dadabase"
     schedule:
       interval: "weekly"
+    ignore:
+      - dependency-name: "Microsoft.EntityFrameworkCore.InMemory"
+        versions: [ ">=9.0.0" ]
+      - dependency-name: "Microsoft.EntityFrameworkCore.Tools"
+        versions: [ ">=9.0.0" ]
+      - dependency-name: "Microsoft.EntityFrameworkCore.Tools"
+        versions: [ ">=9.0.0" ]
+      - dependency-name: "Swashbuckle.AspNetCore"
+        versions: [ ">=9.0.0" ]
+      - dependency-name: "Swashbuckle.AspNetCore.Filters"
+        versions: [ ">=9.0.0" ]
+
   - package-ecosystem: "github-actions"
     directory: "/.github"
     schedule:
