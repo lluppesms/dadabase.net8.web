@@ -39,20 +39,10 @@ permissions:
 
 # ------------------------------------------------------------------------------------------------------------------------
 jobs:
-  ms-devsecops-scan:
-    name: MS DevSecOps Scan
-    if: inputs.runMSDevSecOpsScan
+  scan-code:
+    name: Scan Source Code
     uses: ./.github/workflows/template-scanning-code.yml
     secrets: inherit
     with:
       runMSDevSecOpsScan: ${{ inputs.runMSDevSecOpsScan }}
-      runGHASScan: false
-
-  codeql-scan:
-    name: CodeQL Scan
-    if: inputs.runGHASScan
-    uses: ./.github/workflows/template-scanning-code.yml
-    secrets: inherit
-    with:
       runGHASScan: ${{ inputs.runGHASScan }}
-      runMSDevSecOpsScan: false

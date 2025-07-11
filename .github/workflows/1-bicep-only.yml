@@ -45,11 +45,12 @@ permissions:
 jobs:
   scan-code:
     name: Scan Source Code
-    uses: ./.github/workflows/template-scan-code.yml
+    uses: ./.github/workflows/template-scanning-code.yml
     secrets: inherit
     if: inputs.runSecurityScan
     with:
-      runSecurityScan: ${{ inputs.runSecurityScan }}
+      runMSDevSecOpsScan: ${{ inputs.runSecurityScan }}
+      runGHASScan: false
 
 # ------------------------------------------------------------------------------------------------------------------------
   Deploy_Bicep:
