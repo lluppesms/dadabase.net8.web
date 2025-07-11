@@ -82,7 +82,6 @@ builder.Services.AddServerSideBlazor()
 // ----- Configure APIs -------------------------------------------------------------------
 
 builder.Services.AddControllers();
-builder.Services.AddFluentValidationAutoValidation().AddFluentValidationClientsideAdapters();
 
 //// If using Swagger, configure the API versioning properties of the project.
 //builder.Services.AddApiVersioningConfigured();

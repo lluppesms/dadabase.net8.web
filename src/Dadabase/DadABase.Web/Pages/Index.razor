@@ -37,12 +37,3 @@
 
 </Row>
 <SnackbarStack @ref="snackbarstack" Location="SnackbarStackLocation.BottomEnd" />
-
-@code {
-    private bool isHistoryCollapsed = true;
-
-    private void ToggleHistory()
-    {
-        isHistoryCollapsed = !isHistoryCollapsed;
-    }
-}

@@ -27,6 +27,7 @@ public partial class Index : ComponentBase
 
     // Store the last 10 jokes
     private List<Joke> jokeHistory = new();
+    private bool isHistoryCollapsed = true;
 
     /// <summary>
     /// Initialization
@@ -60,5 +61,9 @@ public partial class Index : ComponentBase
         var elaspsedMS = timer.ElapsedMilliseconds;
         await jokeLoadingIndicator.Hide().ConfigureAwait(false);
         await snackbarstack.PushAsync($"Joke Elapsed: {(decimal)elaspsedMS / 1000m:0.0} seconds", SnackbarColor.Info).ConfigureAwait(false);
+    }
+    private void ToggleHistory()
+    {
+        isHistoryCollapsed = !isHistoryCollapsed;
     }
 }

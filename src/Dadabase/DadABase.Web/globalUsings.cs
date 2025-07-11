@@ -11,7 +11,6 @@ global using DadABase.Helpers;
 global using DadABase.Repositories;
 global using DadABase.Web;
 global using DadABase.Web.Attributes;
-global using FluentValidation.AspNetCore;
 global using Microsoft.AspNetCore.Authentication;
 global using Microsoft.AspNetCore.Authentication.OpenIdConnect;
 global using Microsoft.AspNetCore.Components;
