@@ -21,7 +21,7 @@ on:
     branches: [ "main" ]
 
   schedule:
-    # run this every weekday at 3am even if no pushes or PRs
+    # temporarily -- run this every weekday at 3am even if no pushes or PRs
     - cron: '0 3 * * 1-5'
     # # run this once a month on the 1st day of the month even if no pushes or PRs
     # - cron: '0 0 1 * *'
