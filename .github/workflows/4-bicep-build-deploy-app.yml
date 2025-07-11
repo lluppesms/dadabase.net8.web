@@ -69,7 +69,8 @@ jobs:
     secrets: inherit
     if: inputs.runSecurityScan
     with:
-      runSecurityScan: ${{ inputs.runSecurityScan }}
+      runMSDevSecOpsScan: ${{ inputs.runSecurityScan }}
+      runGHASScan: ${{ inputs.runSecurityScan }}
 
   # ------------------------------------------------------------------------------------------------------------------------
   create-infra:

@@ -6,15 +6,25 @@ run-name: '7 - Scheduled Scan'
 
 on:
   workflow_dispatch:
+    inputs:
+      runMSDevSecOpsScan:
+        description: Run MS DevSecOps Scan
+        default: true
+        type: boolean
+      runGHASScan:
+        description: Run GitHub Advanced Security Scan
+        default: true
+        type: boolean
   push:
     branches: [ "main" ]
   pull_request:
     branches: [ "main" ]
 
-  # run this once a month on the 1st day of the month even if no pushes or PRs
   schedule:
-    - cron: '0 0 1 * *'
-  
+    # temporarily -- run this every weekday at 3am even if no pushes or PRs
+    - cron: '0 3 * * 1-5'
+    # # run this once a month on the 1st day of the month even if no pushes or PRs
+    # - cron: '0 0 1 * *'
 # ------------------------------------------------------------------------------------------------------------------------
 permissions:
   id-token: write
@@ -25,6 +35,7 @@ permissions:
   checks: write
   issues: read
   pull-requests: read
+  packages: read
 
 # ------------------------------------------------------------------------------------------------------------------------
 jobs:
@@ -33,4 +44,5 @@ jobs:
     uses: ./.github/workflows/template-scan-code.yml
     secrets: inherit
     with:
-      runSecurityScan: true
+      runMSDevSecOpsScan: ${{ inputs.runMSDevSecOpsScan }}
+      runGHASScan: ${{ inputs.runGHASScan }}

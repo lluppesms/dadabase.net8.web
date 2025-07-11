@@ -28,7 +28,8 @@ jobs:
     uses: ./.github/workflows/template-scan-code.yml
     secrets: inherit
     with:
-      runSecurityScan: true
+      runMSDevSecOpsScan: true
+      runGHASScan: true
 
 # ------------------------------------------------------------------------------------------------------------------------
   build-app:

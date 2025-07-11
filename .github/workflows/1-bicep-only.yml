@@ -49,7 +49,8 @@ jobs:
     secrets: inherit
     if: inputs.runSecurityScan
     with:
-      runSecurityScan: ${{ inputs.runSecurityScan }}
+      runMSDevSecOpsScan: ${{ inputs.runSecurityScan }}
+      runGHASScan: false
 
 # ------------------------------------------------------------------------------------------------------------------------
   Deploy_Bicep:
