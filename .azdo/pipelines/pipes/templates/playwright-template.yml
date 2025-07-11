@@ -103,16 +103,6 @@ jobs:
   - script: npx playwright install --with-deps
     displayName: 'Install Playwright Browsers'
 
-  # - ${{ if eq(true, parameters.debug) }}:
-  #   - task: CmdLine@2
-  #     displayName: 'Display Files'
-  #     inputs:
-  #       script: |
-  #         echo "Directory of pipeline workspace:"
-  #         tree $(Pipeline.Workspace)
-  #         dir $(Pipeline.Workspace) /s
-  #     condition: succeededOrFailed()
-
   - script: npx playwright test ${{ parameters.testPath }} --config $(configFileName)
     displayName: 'Run Playwright tests'
     env:
@@ -143,4 +133,17 @@ jobs:
       targetPath: playwright-report
       artifact: $(pipelineArtifactName)
       publishLocation: 'pipeline'
+    condition: succeededOrFailed()
+
+  # creates a markdown summary file that is visible in the pipeline "Extensions" tab"
+  - task: CmdLine@2
+    displayName: Create Summary File
+    inputs:
+      script: |
+        echo "Writing to Summary File $(System.DefaultWorkingDirectory)\test_summary_${{ parameters.testType }}.md"
+        echo Ran ${{ parameters.testType }} playwright tests against [$(PLAYWRIGHT_BASE_URL)]($(PLAYWRIGHT_BASE_URL)) >> $(System.DefaultWorkingDirectory)\test_summary_${{ parameters.testType }}.md
+        echo Test Results are in: $(PLAYWRIGHT_RESULTS_PATH) >> $(System.DefaultWorkingDirectory)\test_summary_${{ parameters.testType }}.md
+
+        echo "Publishing Summary File: $(System.DefaultWorkingDirectory)\test_summary_${{ parameters.testType }}.md"
+        echo ##vso[task.uploadsummary]$(System.DefaultWorkingDirectory)\test_summary_${{ parameters.testType }}.md
     condition: succeededOrFailed()

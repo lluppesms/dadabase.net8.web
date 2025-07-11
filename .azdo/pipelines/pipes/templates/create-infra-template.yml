@@ -163,6 +163,24 @@ jobs:
         echo "bicepOutputs: $(bicepOutputs)"
         echo "bicepOutputs-SUBSCRIPTION_ID:     $(bicepOutputs-SUBSCRIPTION_ID)"
         echo "bicepOutputs-RESOURCE_GROUP_NAME: $(bicepOutputs-RESOURCE_GROUP_NAME)"
+        echo "bicepOutputs-HOST_NAME: $(bicepOutputs-HOST_NAME)"
+
+  # creates a markdown summary file that is visible in the pipeline "Extensions" tab"
+  - task: CmdLine@2
+    displayName: Create Summary File
+    continueOnError: true
+    inputs:
+      script: |
+        echo "Writing to Summary File $(System.DefaultWorkingDirectory)\bicep_deploy_summary.md"
+        echo Deployed Bicep File: $(templateFile) >> $(System.DefaultWorkingDirectory)\bicep_deploy_summary.md
+        echo Deployed Parameter File: $(parameterFile) >> $(System.DefaultWorkingDirectory)\bicep_deploy_summary.md
+        echo Deployed to Environment: $(environmentName) >> $(System.DefaultWorkingDirectory)\bicep_deploy_summary.md
+        echo In Subscription:     $(bicepOutputs-SUBSCRIPTION_ID) >> $(System.DefaultWorkingDirectory)\bicep_deploy_summary.md
+        echo To Resource Group:   $(bicepOutputs-RESOURCE_GROUP_NAME) >> $(System.DefaultWorkingDirectory)\bicep_deploy_summary.md
+        echo Created Website:     [https://$(bicepOutputs-HOST_NAME)](https://$(bicepOutputs-HOST_NAME)) >> $(System.DefaultWorkingDirectory)\bicep_deploy_summary.md
+
+        echo "Publishing Summary File: $(System.DefaultWorkingDirectory)\bicep_deploy_summary.md"
+        echo ##vso[task.uploadsummary]$(System.DefaultWorkingDirectory)\bicep_deploy_summary.md
 
   - task: CmdLine@2
     displayName: 'Wipe Parameter File'

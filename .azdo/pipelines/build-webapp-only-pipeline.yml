@@ -32,7 +32,7 @@ parameters:
       - QA
       - PROD
       - MULTIPLE
-    default: DEMO
+    default: DEV
   - name: runUnitTests
     displayName: Run Unit Tests
     type: boolean

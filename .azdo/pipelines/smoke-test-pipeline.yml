@@ -26,7 +26,15 @@ parameters:
       - DEV
       - QA
       - PROD
-    default: DEMO
+    default: DEV
+  - name: testsToRun
+    displayName: Tests to Run
+    type: string
+    values:
+      - API
+      - UI
+      - BOTH
+    default: BOTH
 
 # ----------------------------------------------------------------------------------------------------
 variables:
@@ -34,22 +42,24 @@ variables:
 
 # ----------------------------------------------------------------------------------------------------
 stages:
-- stage: UITestWebApp
-  displayName: UI Test ${{ parameters.environmentToTest }}
-  jobs:
-  - template: pipes/templates/playwright-template.yml
-    parameters:
-      environment: ${{ parameters.environmentToTest }}
-      testType: ${{ variables.playwrightUITestType }}
-      testPath: ${{ variables.playwrightUITestPath }}
-      debug: true
+- ${{ if or(eq(parameters.testsToRun, 'UI'), eq(parameters.testsToRun, 'BOTH')) }}:
+  - stage: UITestWebApp
+    displayName: UI Test ${{ parameters.environmentToTest }}
+    jobs:
+    - template: pipes/templates/playwright-template.yml
+      parameters:
+        environment: ${{ parameters.environmentToTest }}
+        testType: ${{ variables.playwrightUITestType }}
+        testPath: ${{ variables.playwrightUITestPath }}
+        debug: true
 
-- stage: APITestWebApp
-  displayName: API Test ${{ parameters.environmentToTest }}
-  jobs:
-  - template: pipes/templates/playwright-template.yml
-    parameters:
-      environment: ${{ parameters.environmentToTest }}
-      testType: ${{ variables.playwrightAPITestType }}
-      testPath: ${{ variables.playwrightAPITestPath }}
-      debug: true
+- ${{ if or(eq(parameters.testsToRun, 'API'), eq(parameters.testsToRun, 'BOTH')) }}:
+  - stage: APITestWebApp
+    displayName: API Test ${{ parameters.environmentToTest }}
+    jobs:
+    - template: pipes/templates/playwright-template.yml
+      parameters:
+        environment: ${{ parameters.environmentToTest }}
+        testType: ${{ variables.playwrightAPITestType }}
+        testPath: ${{ variables.playwrightAPITestPath }}
+        debug: true

@@ -33,7 +33,7 @@ parameters:
     type: boolean
     default: true
   - name: runUITests
-    displayName: Run UI Tests
+    displayName: Run Playwright Tests
     type: boolean
     default: true
   - name: runGHASScan
