@@ -36,7 +36,7 @@ jobs:
       configFileName: 'playwright.config.cicd.ts'
       PLAYWRIGHT_TEST_PATH: './${{ inputs.testPath }}'
       PLAYWRIGHT_RESULTS_PATH: 'test-results-${{ inputs.testType }}/playwright-results-${{ inputs.testType }}-${{ inputs.envCode }}.xml'
-      PLAYWRIGHT_BASE_URL: 'http://${{ vars.APP_NAME }}-${{ inputs.envCode }}.azurewebsites.net'
+      PLAYWRIGHT_BASE_URL: 'https://${{ vars.APP_NAME }}-${{ inputs.envCode }}.azurewebsites.net'
 
     steps:
     - uses: actions/checkout@v4
