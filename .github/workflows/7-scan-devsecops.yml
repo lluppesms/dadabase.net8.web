@@ -41,7 +41,7 @@ permissions:
 jobs:
   scan-code:
     name: Scan Source Code
-    uses: ./.github/workflows/template-scanning-code.yml
+    uses: ./.github/workflows/template-scan-code.yml
     secrets: inherit
     with:
       runMSDevSecOpsScan: ${{ inputs.runMSDevSecOpsScan }}
