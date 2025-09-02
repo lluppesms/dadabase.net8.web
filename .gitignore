@@ -369,3 +369,6 @@ infra/azdKeys.json
 /blob-report/
 /playwright/.cache/
 
+.env
+package-lock.json
+package-lock.json
