@@ -80,6 +80,11 @@ public class AppSettings
     public bool EnableSwagger { get; set; }
 
     /// <summary>
+    /// Tenant ID for Local development
+    /// </summary>
+    public string VisualStudioTenantId { get; set; }
+
+    /// <summary>
     /// Application Settings
     /// </summary>
     public AppSettings()

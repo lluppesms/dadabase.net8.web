@@ -22,6 +22,7 @@ global using Microsoft.AspNetCore.Mvc.Filters;
 global using Microsoft.AspNetCore.Mvc.ModelBinding;
 global using Microsoft.EntityFrameworkCore;
 global using Microsoft.Extensions.Configuration;
+global using Microsoft.Extensions.Configuration.AzureAppConfiguration;
 global using Microsoft.Identity.Web;
 global using Microsoft.Identity.Web.UI;
 global using Microsoft.JSInterop;

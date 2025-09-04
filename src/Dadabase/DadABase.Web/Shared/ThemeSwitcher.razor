@@ -23,7 +23,7 @@
 
     [Inject] private IJSRuntime JS { get; set; } = default!;
     private bool _initialized = false;
-    private string? _pendingTheme = null;
+    private string _pendingTheme = null;
 
     protected override async Task OnAfterRenderAsync(bool firstRender)
     {

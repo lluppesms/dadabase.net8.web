@@ -4,5 +4,13 @@
   "AppSettings:AppDescription": "An ASP.NET Core Web API for storing Dad Jokes",
   "AppSettings:EnvironmentName": "DEV",
   "AppSettings:DataSource": "JSON",
-  "AppSettings:EnableSwagger": true
+  "AppSettings:EnableSwagger": true,
+  "AppSettings:VisualStudioTenantId": "",
+
+  "AppSettings:AzureOpenAI:Endpoint": "https://lll-oai-service.openai.azure.com/",
+  "AppSettings:AzureOpenAI:DeploymentName": "gpt-4o",
+  "AppSettings:AzureOpenAI:ApiKey": "",
+  "AppSettings:AzureOpenAI:MaxTokens": "100",
+  "AppSettings:AzureOpenAI:Temperature": "0.7",
+  "AppSettings:AzureOpenAI:TopP": "0.95"
 }

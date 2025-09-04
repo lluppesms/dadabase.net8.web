@@ -6,8 +6,8 @@
 // Index Page Code Behind
 // </summary>
 //-----------------------------------------------------------------------
+using DadABase.Web.Helpers;
 using Microsoft.AspNetCore.Authorization;
-using System.Collections.Generic;
 
 namespace DadABase.Web.Pages;
 
@@ -19,6 +19,7 @@ public partial class Index : ComponentBase
 {
     [Inject] IJSRuntime JsInterop { get; set; }
     [Inject] IJokeRepository JokeRepository { get; set; }
+    [Inject] IChatAgent ChatAgent { get; set; }
 
     private Joke myJoke = new();
     private readonly bool addDelay = false;
@@ -61,6 +62,9 @@ public partial class Index : ComponentBase
         var elaspsedMS = timer.ElapsedMilliseconds;
         await jokeLoadingIndicator.Hide().ConfigureAwait(false);
         await snackbarstack.PushAsync($"Joke Elapsed: {(decimal)elaspsedMS / 1000m:0.0} seconds", SnackbarColor.Info).ConfigureAwait(false);
+
+        (var chatRemark, var chatMessages) = await ChatAgent.ChatWithAgent(myJoke.JokeTxt);
+        await snackbarstack.PushAsync($"AI Response: {chatRemark}", SnackbarColor.Info).ConfigureAwait(false);
     }
     private void ToggleHistory()
     {
