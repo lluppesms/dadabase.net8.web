@@ -66,14 +66,20 @@ public partial class Index : ComponentBase
         var elaspsedMS = timer.ElapsedMilliseconds;
         await jokeLoadingIndicator.Hide().ConfigureAwait(false);
         await snackbarstack.PushAsync($"Joke Elapsed: {(decimal)elaspsedMS / 1000m:0.0} seconds", SnackbarColor.Info).ConfigureAwait(false);
-        jokeImageMessage = "🚀 Generating image... please wait!";
+        jokeImageMessage = string.Empty;
         jokeImageUrl = string.Empty;
-        StateHasChanged();
+        jokeImageDescription = string.Empty;
+    }
+    private async Task CreatePicture()
+    {
+        jokeImageMessage = "🚀 Generating image... this will take a sec... please wait!";
+        jokeImageUrl = string.Empty;
+        jokeImageDescription = string.Empty;
 
         (jokeImageDescription, jokeImageUrl, _) = await ChatAgent.ChatWithAgent(myJoke.JokeTxt);
-        jokeImageMessage = "Artistic Rendering!";
-        // await snackbarstack.PushAsync($"AI Description: {jokeImageDescription}", SnackbarColor.Info).ConfigureAwait(false);
-        // await snackbarstack.PushAsync($"AI Image: {jokeImageUrl}", SnackbarColor.Info).ConfigureAwait(false);
+        jokeImageMessage = "Here you go!";
+
+        StateHasChanged();
     }
     private void ToggleHistory()
     {
