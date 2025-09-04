@@ -10,6 +10,14 @@
             </ul>
         </LoadingIndicator>
         <button class="btn btn-primary" @onclick="ExecuteRandom" style="margin-top: 40px;">Tell me another one!</button>
+
+        <h4 style="margin-top: 40px;">@jokeImageMessage</h4>
+        <img src="@jokeImageUrl" width="300" />
+@*         <ul>
+            <li>@jokeImageDescription</li>
+            <li><img src="@jokeImageUrl" width="512" /></li>
+        </ul>
+ *@
         @if (jokeHistory.Any())
         {
             <div style="margin-top: 40px;">

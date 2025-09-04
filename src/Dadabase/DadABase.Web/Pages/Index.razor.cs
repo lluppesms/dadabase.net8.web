@@ -30,6 +30,10 @@ public partial class Index : ComponentBase
     private List<Joke> jokeHistory = new();
     private bool isHistoryCollapsed = true;
 
+    private string jokeImageMessage = string.Empty;
+    private string jokeImageDescription = string.Empty;
+    private string jokeImageUrl = string.Empty;
+
     /// <summary>
     /// Initialization
     /// </summary>
@@ -62,9 +66,14 @@ public partial class Index : ComponentBase
         var elaspsedMS = timer.ElapsedMilliseconds;
         await jokeLoadingIndicator.Hide().ConfigureAwait(false);
         await snackbarstack.PushAsync($"Joke Elapsed: {(decimal)elaspsedMS / 1000m:0.0} seconds", SnackbarColor.Info).ConfigureAwait(false);
+        jokeImageMessage = "🚀 Generating image... please wait!";
+        jokeImageUrl = string.Empty;
+        StateHasChanged();
 
-        (var chatRemark, var chatMessages) = await ChatAgent.ChatWithAgent(myJoke.JokeTxt);
-        await snackbarstack.PushAsync($"AI Response: {chatRemark}", SnackbarColor.Info).ConfigureAwait(false);
+        (jokeImageDescription, jokeImageUrl, _) = await ChatAgent.ChatWithAgent(myJoke.JokeTxt);
+        jokeImageMessage = "Artistic Rendering!";
+        // await snackbarstack.PushAsync($"AI Description: {jokeImageDescription}", SnackbarColor.Info).ConfigureAwait(false);
+        // await snackbarstack.PushAsync($"AI Image: {jokeImageUrl}", SnackbarColor.Info).ConfigureAwait(false);
     }
     private void ToggleHistory()
     {

@@ -1,6 +1,9 @@
 ﻿using Azure.AI.OpenAI;
 using Azure.Identity;
+using Microsoft.AspNetCore.SignalR;
 using OpenAI.Chat;
+using OpenAI.Images;
+using System.ClientModel;
 
 // See https://learn.microsoft.com/en-us/azure/azure-app-configuration/quickstart-chat-completion-dotnet
 
@@ -16,7 +19,7 @@ public interface IChatAgent
     /// </summary>
     /// <param name="userInput"></param>
     /// <returns></returns>
-    Task<(string, List<ChatMessage>)> ChatWithAgent(string userInput);
+    Task<(string, string, List<ChatMessage>)> ChatWithAgent(string userInput);
 }
 
 /// <summary>
@@ -25,8 +28,9 @@ public interface IChatAgent
 public class ChatAgent : IChatAgent
 {
     private readonly ChatClient chatClient = null;
-    ChatCompletionConfiguration chatCompletionConfiguration = null;
-    ChatCompletionOptions requestOptions = null;
+    private readonly ImageClient imageClient = null;
+    private readonly ChatCompletionConfiguration chatCompletionConfiguration = null;
+    private readonly ChatCompletionOptions requestOptions = null;
 
     /// <summary>
     /// Initialization
@@ -36,7 +40,12 @@ public class ChatAgent : IChatAgent
     {
         Uri openaiEndpoint = new(config["AppSettings:AzureOpenAI:Endpoint"]);
         var openaiDeploymentName = config["AppSettings:AzureOpenAI:DeploymentName"];
-        //var openaiApiKey = appSettings["AppSettings:AzureOpenAI:ApiKey"];
+        var openaiApiKey = config["AppSettings:AzureOpenAI:ApiKey"];
+
+        Uri openaiImageEndpoint = new(config["AppSettings:AzureOpenAI:Image:Endpoint"]);
+        var openaiImageDeploymentName = config["AppSettings:AzureOpenAI:Image:DeploymentName"];
+        var openaiImageApiKey = config["AppSettings:AzureOpenAI:Image:ApiKey"];
+
         var openaiMaxTokens = int.TryParse(config["AppSettings:AzureOpenAI:MaxTokens"], out var parsedMaxTokens) ? parsedMaxTokens : 100;
         var openaiTemperature = float.TryParse(config["AppSettings:AzureOpenAI:Temperature"], out var parsedTemperature) ? parsedTemperature : 0.7f;
         float openaiTopP = float.TryParse(config["AppSettings:AzureOpenAI:TopP"], out var topP) ? topP :  0.95f;
@@ -50,12 +59,14 @@ public class ChatAgent : IChatAgent
             });
 
         // Initialize the AzureOpenAIClient
-        var _client = new AzureOpenAIClient(openaiEndpoint, credential);
-        // Initialize the AzureOpenAIClient with an API Key instead of user credentials...
-        //_client = new(openaiEndpoint, new ApiKeyCredential(keyFromEnvironment));
+        var _chatClientHost = new AzureOpenAIClient(openaiEndpoint, credential);
+        //var _chatClientHost = new(openaiEndpoint, new ApiKeyCredential(keyFromEnvironment));
+        chatClient = _chatClientHost.GetChatClient(openaiDeploymentName);
 
-        // Create a chat client
-        chatClient = _client.GetChatClient(openaiDeploymentName);
+        // Create an image generation client
+        //var _imageClientHost = new AzureOpenAIClient(openaiImageEndpoint, credential);
+        var _imageClientHost = new AzureOpenAIClient(openaiImageEndpoint, new ApiKeyCredential(openaiImageApiKey));
+        imageClient = _imageClientHost.GetImageClient(openaiImageDeploymentName);
 
         // alternate way of doing this...
         //chatClient = new(
@@ -72,10 +83,11 @@ public class ChatAgent : IChatAgent
             Messages = [
                 new() {
                     Role = "system",
-                    Content = "You are going to be told a funny joke. " +
+                    Content = "You are going to be told a funny joke or a humorous line or an insightful quote. " +
                     "It is your responsibility to describe that joke so that an artist can draw a picture of the mental image that this joke creates. " +
                     "Give clear instructions on how the scene should look and what objects should be included in the scene." +
-                    "Instruct the artist to draw it in a humorous cartoon format."
+                    "Instruct the artist to draw it in a humorous cartoon format." +
+                    "Make sure the description does not ask for anything violent, sexual, or political so that it does not violate safety rules."
                 }
             ]
         };
@@ -101,7 +113,7 @@ public class ChatAgent : IChatAgent
             _ => throw new ArgumentException($"Unknown role: {message.Role}", nameof(message.Role))
         });
     }
-    public async Task<(string, List<ChatMessage>)> ChatWithAgent(string userInput)
+    public async Task<(string, string, List<ChatMessage>)> ChatWithAgent(string userInput)
     {
         var chatConversation = new List<ChatMessage>
             {
@@ -112,15 +124,43 @@ public class ChatAgent : IChatAgent
         // Get latest system message from AI configuration
         var chatMessages = new List<ChatMessage>(GetChatMessages(chatCompletionConfiguration));
         chatMessages.AddRange(chatConversation);
+        string imageDescription = string.Empty;
+        string imageUrl = string.Empty;
+        bool startedImageGeneration = false;
 
-        // Get AI response and add it to chat conversation
-        var response = await chatClient.CompleteChatAsync(chatMessages, requestOptions);
+        try
+        {
+            // Get AI response and add it to chat conversation
+            var response = await chatClient.CompleteChatAsync(chatMessages, requestOptions);
 
-        string aiResponse = response.Value.Content[0].Text;
-        chatConversation.Add(ChatMessage.CreateAssistantMessage(aiResponse));
-        return (aiResponse, chatConversation);
+            imageDescription = response.Value.Content[0].Text;
+            chatConversation.Add(ChatMessage.CreateAssistantMessage(imageDescription));
+            Console.WriteLine($"Image description {imageDescription}");
+
+            startedImageGeneration = true;
+            var imageResult = await imageClient.GenerateImageAsync(imageDescription, new()
+            {
+                Quality = GeneratedImageQuality.Standard,
+                Size = GeneratedImageSize.W1024xH1024,
+                Style = GeneratedImageStyle.Vivid,
+                ResponseFormat = GeneratedImageFormat.Uri
+            });
+
+            var image = imageResult.Value;
+            imageUrl = image.ImageUri.ToString();
+            Console.WriteLine($"Image URL {imageUrl}");
+
+            chatConversation.Add(ChatMessage.CreateAssistantMessage(imageUrl));
+
+            return (imageDescription, imageUrl, chatConversation);
+        }
+        catch (Exception ex)
+        {
+            var errorMessage = ex.Message;
+            Console.WriteLine($"Error during chat completion or image generation {errorMessage}");
+            return (imageDescription, startedImageGeneration ? errorMessage : imageUrl, chatConversation);
+        }
     }
-
     internal class ChatCompletionConfiguration
     {
         [ConfigurationKeyName("model")]
