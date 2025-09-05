@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright file="About.razor.cs" company="Luppes Consulting, Inc.">
-// Copyright 2024, Luppes Consulting, Inc. All rights reserved.
+// Copyright 2025, Luppes Consulting, Inc. All rights reserved.
 // </copyright>
 // <summary>
 // About Page Code-Behind
