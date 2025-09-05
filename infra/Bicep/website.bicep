@@ -162,12 +162,13 @@ resource appServiceMetricLogging 'Microsoft.Insights/diagnosticSettings@2021-05-
         enabled: true
       }
     ]
-    logs: [
-      {
-        category: 'AppRequests'
-        enabled: true
-      }
-    ]    
+    //    this should be right but it's not supported... :(
+    // logs: [
+    //   {
+    //     category: 'AppRequests'
+    //     enabled: true
+    //   }
+    // ]    
   }
 }
 output principalId string = webSiteResource.identity.principalId
