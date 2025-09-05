@@ -10,7 +10,7 @@
   "AppSettings:AzureOpenAI:Chat:Endpoint": "https://lll-oai-service.openai.azure.com/",
   "AppSettings:AzureOpenAI:Chat:DeploymentName": "gpt-4o",
   "AppSettings:AzureOpenAI:Chat:ApiKey": "",
-  "AppSettings:AzureOpenAI:Chat:MaxTokens": "100",
+  "AppSettings:AzureOpenAI:Chat:MaxTokens": "300",
   "AppSettings:AzureOpenAI:Chat:Temperature": "0.7",
   "AppSettings:AzureOpenAI:Chat:TopP": "0.95",
 

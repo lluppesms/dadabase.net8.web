@@ -143,7 +143,7 @@ public class AIHelper : IAIHelper
         openaiEndpoint = !string.IsNullOrEmpty(openaiEndpointUrl) ? new(config["AppSettings:AzureOpenAI:Chat:Endpoint"]) : null;
         openaiDeploymentName = config["AppSettings:AzureOpenAI:Chat:DeploymentName"];
         openaiApiKey = config["AppSettings:AzureOpenAI:Chat:ApiKey"];
-        openaiMaxTokens = int.TryParse(config["AppSettings:AzureOpenAI:Chat:MaxTokens"], out var parsedMaxTokens) ? parsedMaxTokens : 100;
+        openaiMaxTokens = int.TryParse(config["AppSettings:AzureOpenAI:Chat:MaxTokens"], out var parsedMaxTokens) ? parsedMaxTokens : 300;
         openaiTemperature = float.TryParse(config["AppSettings:AzureOpenAI:Chat:Temperature"], out var parsedTemperature) ? parsedTemperature : 0.7f;
         openaiTopP = float.TryParse(config["AppSettings:AzureOpenAI:Chat:TopP"], out var topP) ? topP : 0.95f;
 

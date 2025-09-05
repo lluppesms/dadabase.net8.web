@@ -34,7 +34,9 @@ public partial class Index : ComponentBase
     private string jokeImageDescription = string.Empty;
     private string jokeImageUrl = string.Empty;
     private bool showButtons = false;
+    private bool imageGenerating = false;
     private LoadingIndicator imageLoadingIndicator;
+    private Modal imageDescriptionPopup;
 
     /// <summary>
     /// Initialization
@@ -83,7 +85,8 @@ public partial class Index : ComponentBase
         jokeImageUrl = string.Empty;
         jokeImageDescription = string.Empty;
 
-        (jokeImageDescription, var success, var errorMessage) = await GenAIAgent.GetJokeSceneDescription(myJoke.JokeTxt);
+        var scene = $"{myJoke.JokeTxt} ({myJoke.JokeCategoryTxt}";
+        (jokeImageDescription, var success, var errorMessage) = await GenAIAgent.GetJokeSceneDescription(scene);
         jokeImageMessage = string.Empty;
         imageDescriptionGenerated = success;
         showButtons = true;
@@ -92,6 +95,7 @@ public partial class Index : ComponentBase
     private async Task CreatePicture()
     {
         showButtons = false;
+        imageGenerating = true;
         jokeImageMessage = "🚀 OK - I've got an idea! Let me draw that for you! (gimme a sec...)";
         await imageLoadingIndicator.Show();
         StateHasChanged();
@@ -99,11 +103,22 @@ public partial class Index : ComponentBase
         (jokeImageUrl, var genSuccess, var genErrorMessage) = await GenAIAgent.GenerateAnImage(jokeImageDescription);
         jokeImageMessage = genSuccess ? string.Empty : genErrorMessage;
         showButtons = true;
+        imageGenerating = false;
         await imageLoadingIndicator.Hide();
         StateHasChanged();
     }
     private void ToggleHistory()
     {
         isHistoryCollapsed = !isHistoryCollapsed;
+    }
+
+    private void ShowImageDescriptionPopup()
+    {
+        imageDescriptionPopup.Show();
+    }
+
+    private void CloseImageDescriptionPopup()
+    {
+        imageDescriptionPopup.Hide();
     }
 }
