@@ -25,7 +25,13 @@
         }
         <LoadingIndicator @ref="imageLoadingIndicator">
             <br />
-            <img src="@jokeImageUrl" width="300" style="cursor: pointer;" @onclick="ShowImageDescriptionPopup" />
+            @if (!string.IsNullOrEmpty(jokeImageUrl)) {
+              <img src="@jokeImageUrl" width="300" style="cursor: pointer;" @onclick="ShowImageDescriptionPopup" />
+            }
+            else
+            {
+              <span style="margin-top: 15px; font-size: 0.8em;">@jokeImageDescription</span>
+            }
         </LoadingIndicator>
         <Modal @ref="imageDescriptionPopup">
             <ModalContent Centered>
