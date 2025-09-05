@@ -83,7 +83,7 @@ public partial class Index : ComponentBase
         jokeImageUrl = string.Empty;
         jokeImageDescription = string.Empty;
 
-        (jokeImageDescription, var success, var errorMessage) = await GenAIAgent.GetJokeImageDescription(myJoke.JokeTxt);
+        (jokeImageDescription, var success, var errorMessage) = await GenAIAgent.GetJokeSceneDescription(myJoke.JokeTxt);
         jokeImageMessage = string.Empty;
         imageDescriptionGenerated = success;
         showButtons = true;

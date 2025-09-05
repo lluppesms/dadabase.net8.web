@@ -16,7 +16,7 @@ public interface IAIHelper
     /// <summary>
     /// Give it a joke and get back an image description
     /// </summary>
-    Task<(string description, bool success, string message)> GetJokeImageDescription(string jokeText);
+    Task<(string description, bool success, string message)> GetJokeSceneDescription(string jokeText);
 
     /// <summary>
     /// Give this a description and get back an generated image URL
