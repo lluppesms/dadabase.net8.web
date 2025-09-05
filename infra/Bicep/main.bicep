@@ -129,7 +129,7 @@ module webSiteAppSettingsModule 'websiteappsettings.bicep' = {
     appInsightsKey: webSiteModule.outputs.appInsightsKey
     customAppSettings: {
       AppSettings__AppInsights_InstrumentationKey: webSiteModule.outputs.appInsightsKey
-      APPLICATIONINSIGHTS_CONNECTION_STRING: webSiteModule.outputs.appInsightsKey
+      APPLICATIONINSIGHTS_CONNECTION_STRING: webSiteModule.outputs.appInsightsConnectionString
       AppSettings__EnvironmentName: environmentCode
       AppSettings__EnableSwagger: appSwaggerEnabled
       AppSettings__DataSource: appDataSource
