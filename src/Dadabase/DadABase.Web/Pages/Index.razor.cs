@@ -6,7 +6,6 @@
 // Index Page Code Behind
 // </summary>
 //-----------------------------------------------------------------------
-using DadABase.Web.Helpers;
 using Microsoft.AspNetCore.Authorization;
 
 namespace DadABase.Web.Pages;
@@ -19,7 +18,7 @@ public partial class Index : ComponentBase
 {
     [Inject] IJSRuntime JsInterop { get; set; }
     [Inject] IJokeRepository JokeRepository { get; set; }
-    [Inject] IChatAgent ChatAgent { get; set; }
+    [Inject] IAIHelper GenAIAgent { get; set; }
 
     private Joke myJoke = new();
     private readonly bool addDelay = false;
@@ -30,9 +29,12 @@ public partial class Index : ComponentBase
     private List<Joke> jokeHistory = new();
     private bool isHistoryCollapsed = true;
 
+    private bool imageDescriptionGenerated = false;
     private string jokeImageMessage = string.Empty;
     private string jokeImageDescription = string.Empty;
     private string jokeImageUrl = string.Empty;
+    private bool showButtons = false;
+    private LoadingIndicator imageLoadingIndicator;
 
     /// <summary>
     /// Initialization
@@ -51,6 +53,8 @@ public partial class Index : ComponentBase
 
     private async Task ExecuteRandom()
     {
+        showButtons = false;
+        imageDescriptionGenerated = false;
         myJoke = new();
         await jokeLoadingIndicator.Show();
         var timer = Stopwatch.StartNew();
@@ -66,19 +70,36 @@ public partial class Index : ComponentBase
         var elaspsedMS = timer.ElapsedMilliseconds;
         await jokeLoadingIndicator.Hide().ConfigureAwait(false);
         await snackbarstack.PushAsync($"Joke Elapsed: {(decimal)elaspsedMS / 1000m:0.0} seconds", SnackbarColor.Info).ConfigureAwait(false);
+
         jokeImageMessage = string.Empty;
         jokeImageUrl = string.Empty;
         jokeImageDescription = string.Empty;
-    }
-    private async Task CreatePicture()
-    {
-        jokeImageMessage = "🚀 Generating image... this will take a sec... please wait!";
+
+        jokeImageMessage = "🚀 Generating a mental image of this scenario...";
+
+        await imageLoadingIndicator.Show();
+        StateHasChanged();
+
         jokeImageUrl = string.Empty;
         jokeImageDescription = string.Empty;
 
-        (jokeImageDescription, jokeImageUrl, _) = await ChatAgent.ChatWithAgent(myJoke.JokeTxt);
-        jokeImageMessage = "Here you go!";
+        (jokeImageDescription, var success, var errorMessage) = await GenAIAgent.GetJokeImageDescription(myJoke.JokeTxt);
+        jokeImageMessage = string.Empty;
+        imageDescriptionGenerated = success;
+        showButtons = true;
+        await imageLoadingIndicator.Hide();
+    }
+    private async Task CreatePicture()
+    {
+        showButtons = false;
+        jokeImageMessage = "🚀 OK - I've got an idea! Let me draw that for you! (gimme a sec...)";
+        await imageLoadingIndicator.Show();
+        StateHasChanged();
 
+        (jokeImageUrl, var genSuccess, var genErrorMessage) = await GenAIAgent.GenerateAnImage(jokeImageDescription);
+        jokeImageMessage = genSuccess ? string.Empty : genErrorMessage;
+        showButtons = true;
+        await imageLoadingIndicator.Hide();
         StateHasChanged();
     }
     private void ToggleHistory()

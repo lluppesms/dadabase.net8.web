@@ -7,16 +7,16 @@
   "AppSettings:EnableSwagger": true,
   "AppSettings:VisualStudioTenantId": "",
 
-  "AppSettings:AzureOpenAI:Endpoint": "https://lll-oai-service.openai.azure.com/",
-  "AppSettings:AzureOpenAI:DeploymentName": "gpt-4o",
+  "AppSettings:AzureOpenAI:Chat:Endpoint": "https://lll-oai-service.openai.azure.com/",
+  "AppSettings:AzureOpenAI:Chat:DeploymentName": "gpt-4o",
+  "AppSettings:AzureOpenAI:Chat:ApiKey": "",
+  "AppSettings:AzureOpenAI:Chat:MaxTokens": "100",
+  "AppSettings:AzureOpenAI:Chat:Temperature": "0.7",
+  "AppSettings:AzureOpenAI:Chat:TopP": "0.95",
 
   "AppSettings:AzureOpenAI:Image:Endpoint": "https://lylel-mf4exhkw-australiaeast.openai.azure.com/",
   "AppSettings:AzureOpenAI:Image:ApiKey": "",
   "AppSettings:AzureOpenAI:Image:DeploymentName": "dall-e-3",
-  "AppSettings:AzureOpenAI:Image:DeploymentName:Experiment": "gpt-image-1",
+  "AppSettings:AzureOpenAI:Image:DeploymentName:Experiment": "gpt-image-1"
 
-  "AppSettings:AzureOpenAI:ApiKey": "",
-  "AppSettings:AzureOpenAI:MaxTokens": "100",
-  "AppSettings:AzureOpenAI:Temperature": "0.7",
-  "AppSettings:AzureOpenAI:TopP": "0.95"
 }

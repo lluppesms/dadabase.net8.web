@@ -1,4 +1,4 @@
-using DadABase.Web.Helpers;
+using DadABase.Web.Repositories;
 using Microsoft.Extensions.DependencyInjection;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -29,7 +29,7 @@ builder.Services.AddSingleton<AppSettings>(settings);
 
 // ----- Configure Data Source and Repositories -----------------------------------------------------------------
 builder.Services.AddSingleton<IJokeRepository, JokeRepository>();
-builder.Services.AddSingleton<IChatAgent, ChatAgent>();
+builder.Services.AddSingleton<IAIHelper, AIHelper>();
 
 // ----- Configure Authentication ---------------------------------------------------------------------
 var authSettings = builder.Configuration.GetSection("AzureAD");

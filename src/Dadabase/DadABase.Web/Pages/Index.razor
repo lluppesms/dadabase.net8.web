@@ -10,15 +10,19 @@
             </ul>
         </LoadingIndicator>
         <button class="btn btn-primary" @onclick="ExecuteRandom" style="margin-top: 40px;">Tell me another one!</button>
-        <button class="btn btn-primary" @onclick="CreatePicture" style="margin-top: 40px; margin-left: 20px;">Paint me a picture!</button>
 
-        <h4 style="margin-top: 40px;">@jokeImageMessage</h4>
-        <img src="@jokeImageUrl" width="300" />
-@*         <ul>
-            <li>@jokeImageDescription</li>
-            <li><img src="@jokeImageUrl" width="512" /></li>
-        </ul>
- *@
+        @if (imageDescriptionGenerated && showButtons)
+        {
+            <button class="btn btn-primary" @onclick="CreatePicture" style="margin-top: 40px; margin-left: 20px;">Paint me a picture!</button>
+        }
+        <br /><span style="margin-top: 40px; font-size: 1.2em; font-style: italic;">@jokeImageMessage</span>
+
+@*         @if (!string.IsNullOrEmpty(@jokeImageUrl))
+        { *@
+            <LoadingIndicator @ref="imageLoadingIndicator">
+                <br /><img src="@jokeImageUrl" width="300" />
+            </LoadingIndicator>
+        @* } *@
         @if (jokeHistory.Any())
         {
             <div style="margin-top: 40px;">
