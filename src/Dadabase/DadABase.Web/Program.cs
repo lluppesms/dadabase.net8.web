@@ -1,3 +1,9 @@
+using DadABase.Web.Repositories;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using Azure.Monitor.OpenTelemetry.AspNetCore;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // ----------------------------------------------------------------------------------------------------
@@ -16,16 +22,26 @@ var settings = builder.Configuration.GetSection(nameof(AppSettings)).Get<AppSett
 // set the application title from the app settings
 DadABase.Data.Constants.Initialize(settings);
 
-//// TODO: change the aapplication logger to use a custom logger and/or Serilog...
-//// https://docs.microsoft.com/en-us/aspnet/core/blazor/fundamentals/logging?view=aspnetcore-6.0
-builder.Logging.SetMinimumLevel(LogLevel.Warning);
-MyLogger.InitializeLogger(settings);
+if (!string.IsNullOrEmpty(builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"]))
+{
+    builder.Services.AddOpenTelemetry().UseAzureMonitor();
+}
+
+// Add Application Insights telemetry
+//builder.Services.AddApplicationInsightsTelemetry(builder.Configuration["ApplicationInsights:InstrumentationKey"]);
+//builder.Services.AddLogging(builder =>
+//{
+//    builder.ClearProviders();
+//    builder.AddConsole();
+//    //builder.AddApplicationInsights(builder.Configuration["ApplicationInsights:InstrumentationKey"] ?? string.Empty);
+//});
 
 builder.Services.AddSingleton(builder.Configuration);
 builder.Services.AddSingleton<AppSettings>(settings);
 
 // ----- Configure Data Source and Repositories -----------------------------------------------------------------
 builder.Services.AddSingleton<IJokeRepository, JokeRepository>();
+builder.Services.AddSingleton<IAIHelper, AIHelper>();
 
 // ----- Configure Authentication ---------------------------------------------------------------------
 var authSettings = builder.Configuration.GetSection("AzureAD");

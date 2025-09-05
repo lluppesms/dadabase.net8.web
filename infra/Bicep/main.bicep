@@ -26,6 +26,16 @@ param appSwaggerEnabled string = 'true'
 param servicePlanName string = ''
 param webAppKind string = 'linux' // 'linux' or 'windows'
 
+param azureOpenAIChatEndpoint string = ''
+param azureOpenAIChatDeploymentName string = ''
+param azureOpenAIChatApiKey string = ''
+param azureOpenAIChatMaxTokens string = ''
+param azureOpenAIChatTemperature string = ''
+param azureOpenAIChatTopP string = ''
+param azureOpenAIImageEndpoint string = ''
+param azureOpenAIImageDeploymentName string = ''
+param azureOpenAIImageApiKey string = ''
+
 // @description('Admin IP Address to add to Key Vault and Container Registry?')
 // param myIpAddress string = ''
 // @description('Add Role Assignments for the user assigned identity?')
@@ -119,10 +129,20 @@ module webSiteAppSettingsModule 'websiteappsettings.bicep' = {
     appInsightsKey: webSiteModule.outputs.appInsightsKey
     customAppSettings: {
       AppSettings__AppInsights_InstrumentationKey: webSiteModule.outputs.appInsightsKey
+      APPLICATIONINSIGHTS_CONNECTION_STRING: webSiteModule.outputs.appInsightsConnectionString
       AppSettings__EnvironmentName: environmentCode
       AppSettings__EnableSwagger: appSwaggerEnabled
       AppSettings__DataSource: appDataSource
       AppSettings__ApiKey: apiKey
+      AppSettings__AzureOpenAI__Chat__Endpoint: azureOpenAIChatEndpoint
+      AppSettings__AzureOpenAI__Chat__DeploymentName: azureOpenAIChatDeploymentName
+      AppSettings__AzureOpenAI__Chat__ApiKey: azureOpenAIChatApiKey
+      AppSettings__AzureOpenAI__Chat__MaxTokens: azureOpenAIChatMaxTokens
+      AppSettings__AzureOpenAI__Chat__Temperature: azureOpenAIChatTemperature
+      AppSettings__AzureOpenAI__Chat__TopP: azureOpenAIChatTopP
+      AppSettings__AzureOpenAI__Image__Endpoint: azureOpenAIImageEndpoint
+      AppSettings__AzureOpenAI__Image__DeploymentName: azureOpenAIImageDeploymentName
+      AppSettings__AzureOpenAI__Image__ApiKey: azureOpenAIImageApiKey
       AzureAD__Instance: adInstance
       AzureAD__Domain: adDomain
       AzureAD__TenantId: adTenantId

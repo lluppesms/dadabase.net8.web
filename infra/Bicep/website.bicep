@@ -160,12 +160,14 @@ resource appServiceMetricLogging 'Microsoft.Insights/diagnosticSettings@2021-05-
       {
         category: 'AllMetrics'
         enabled: true
-        // retentionPolicy: {
-        //   days: 30
-        //   enabled: true 
-        // }
       }
     ]
+    logs: [
+      {
+        category: 'AppRequests'
+        enabled: true
+      }
+    ]    
   }
 }
 output principalId string = webSiteResource.identity.principalId
@@ -173,5 +175,6 @@ output name string = webSiteName
 output hostName string = webSiteResource.properties.defaultHostName
 output appInsightsName string = appInsightsName
 output appInsightsKey string = appInsightsResource.properties.InstrumentationKey
+output appInsightsConnectionString string = appInsightsResource.properties.ConnectionString
 // Note: This will give you a warning saying it's not right, but it will contain the right value!
 // output ipAddress string = webSiteResource.properties.inboundIpAddress 

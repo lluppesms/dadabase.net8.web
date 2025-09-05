@@ -1,6 +1,6 @@
 ﻿//-----------------------------------------------------------------------
 // <copyright file="AppSettings.cs" company="Luppes Consulting, Inc.">
-// Copyright 2024, Luppes Consulting, Inc. All rights reserved.
+// Copyright 2025, Luppes Consulting, Inc. All rights reserved.
 // </copyright>
 // <summary>
 // Application Settings
@@ -78,6 +78,11 @@ public class AppSettings
     /// Should I use the local database or the Azure one...?
     /// </summary>
     public bool EnableSwagger { get; set; }
+
+    /// <summary>
+    /// Tenant ID for Local development
+    /// </summary>
+    public string VisualStudioTenantId { get; set; }
 
     /// <summary>
     /// Application Settings
