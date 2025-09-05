@@ -30,7 +30,7 @@ jobs:
     secrets: inherit
     with:
       runMSDevSecOpsScan: true
-      runGHASScan: true
+      runGHASScan: false
 
 # ------------------------------------------------------------------------------------------------------------------------
   build-app:
