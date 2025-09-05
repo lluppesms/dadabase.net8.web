@@ -160,12 +160,14 @@ resource appServiceMetricLogging 'Microsoft.Insights/diagnosticSettings@2021-05-
       {
         category: 'AllMetrics'
         enabled: true
-        // retentionPolicy: {
-        //   days: 30
-        //   enabled: true 
-        // }
       }
     ]
+    logs: [
+      {
+        category: 'AppRequests'
+        enabled: true
+      }
+    ]    
   }
 }
 output principalId string = webSiteResource.identity.principalId
