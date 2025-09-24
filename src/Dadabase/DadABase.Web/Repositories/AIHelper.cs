@@ -36,14 +36,16 @@ public class AIHelper : IAIHelper
     private readonly string vsTenantId = string.Empty;
     private DefaultAzureCredential credential = null;
     //private readonly ILogger logger;
-#endregion
+    #endregion
 
     private const string JokeImageGeneratorPrompt =
         "You are going to be told a funny joke or a humorous line or an insightful quote. " +
         "It is your responsibility to describe that joke so that an artist can draw a picture of the mental image that this joke creates. " +
         "Give clear instructions on how the scene should look and what objects should be included in the scene." +
         "Instruct the artist to draw it in a humorous cartoon format." +
-        "Make sure the description does not ask for anything violent, sexual, or political so that it does not violate safety rules.";
+        "Make sure the description does not ask for anything violent, sexual, or political so that it does not violate safety rules. " +
+        "Keep the scene description under 250 words or less.";
+
 
     /// <summary>
     /// Give it a joke and get back an image description
