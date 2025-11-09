@@ -24,6 +24,7 @@ param adCallbackPath string = '/signin-oidc'
 param appDataSource string = 'JSON'
 param appSwaggerEnabled string = 'true'
 param servicePlanName string = ''
+param servicePlanResourceGroupName string = '' // if using an existing service plan in a different resource group
 param webAppKind string = 'linux' // 'linux' or 'windows'
 
 param azureOpenAIChatEndpoint string = ''
@@ -99,6 +100,7 @@ module appServicePlanModule 'websiteserviceplan.bicep' = {
     environmentCode: environmentCode
     appServicePlanName: servicePlanName == '' ? resourceNames.outputs.webSiteAppServicePlanName : servicePlanName
     existingServicePlanName: servicePlanName
+    existingServicePlanResourceGroupName: servicePlanResourceGroupName
     webAppKind: webAppKind
   }
 }
@@ -115,6 +117,7 @@ module webSiteModule 'website.bicep' = {
     webAppKind: webAppKind
     workspaceId: logAnalyticsWorkspaceModule.outputs.id
     appServicePlanName: appServicePlanModule.outputs.name
+    appServicePlanResourceGroupName: appServicePlanModule.outputs.resourceGroupName
   }
 }
 
