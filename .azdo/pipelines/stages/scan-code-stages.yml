@@ -1,0 +1,30 @@
+# ------------------------------------------------------------------------------------------------------------------------
+# Pipeline Template to Scan Application Only
+# ------------------------------------------------------------------------------------------------------------------------
+parameters:
+- name: runGHASScan
+  default: 'false'
+- name: runMSDevSecOpsScan
+  default: 'false'
+- name: runSBOM
+  default: 'false'
+
+# ----------------------------------------------------------------------------------------------------
+stages:
+- stage: ScanApplication
+  displayName: Scan Application
+  jobs:
+  - template: ../jobs/scan-code-job.yml
+    parameters:
+      environmentName: 'DEV'
+      runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
+      runGHASScan: ${{ parameters.runGHASScan }}
+
+- ${{ if eq(lower(parameters.runSBOM), 'true') }}:
+  - stage: GenerateSBOM
+    displayName: Generate SBOM
+    dependsOn: []
+    jobs:
+    - template: ../jobs/create-sbom-job.yml
+      parameters:
+        environmentName: 'DEV'

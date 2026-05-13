@@ -1,0 +1,206 @@
+# ----------------------------------------------------------------------------------------------------
+# Template to build Azure WebApp and create artifacts
+# ----------------------------------------------------------------------------------------------------
+parameters: 
+- name: environmentName
+  default:  'DEV'
+- name: runUnitTests
+  default: 'false'
+
+# ------------------------------------------------------------------------------------------------------------------------
+jobs:
+- deployment: InitializeBuild${{ parameters.environmentName }}WebApp
+  displayName: Initialize ${{ parameters.environmentName }} Build WebApp
+  environment: ${{ parameters.environmentName }}
+
+- job: Build${{ parameters.environmentName }}WebApp
+  displayName: Build ${{ parameters.environmentName }} WebApp
+  
+  variables:
+    - name: environmentName
+      value: ${{ parameters.environmentName }}
+    - template: ../vars/var-common.yml
+
+    - name: rootDirectory
+      value: '$(System.DefaultWorkingDirectory)/$(webAppFolderName)/'
+    - name: workingDirectory
+      value: '$(System.DefaultWorkingDirectory)/$(webAppFolderName)$(webAppProjectFolderName)/'
+    - name: projectDirectory
+      value: '$(System.DefaultWorkingDirectory)/$(webAppFolderName)$(webAppProjectFolderName)/'
+    - name: testDirectory
+      value: '$(System.DefaultWorkingDirectory)/$(webAppFolderName)$(webTestFolderName)/'
+
+    - name: projectFullName
+      value: '$(webAppFolderName)$(webAppProjectFolderName)/$(webAppProjectName).$(webAppProjectExtension)'
+    - name: projectFullPath
+      value: '$(System.DefaultWorkingDirectory)/$(projectFullName)'
+
+    - name: testFullName
+      value: '$(webAppFolderName)$(webTestFolderName)/$(webTestProjectName).$(webAppProjectExtension)'
+    - name: testFullPath
+      value: '$(System.DefaultWorkingDirectory)/$(testFullName)'
+
+    - name: appVersion
+      value: $(Build.BuildNumber)
+    - name: buildInfoFilePath
+      value: '$(projectDirectory)wwwroot\buildinfo.json'
+
+  steps:
+  - task: Bash@3
+    displayName: 'Display Variables'
+    inputs:
+      targetType: 'inline'
+      script: |
+        echo "----------------------------------------"
+        echo "##[group]Display All Environment Variables:"
+        printenv | sort
+        echo "##[endgroup]"
+
+        echo "Build.ArtifactStagingDirectory=$(Build.ArtifactStagingDirectory)"
+        echo "System.DefaultWorkingDirectory=$(System.DefaultWorkingDirectory)"
+        echo "Build.SourcesDirectory=$(Build.SourcesDirectory)"
+        echo "Build.BuildId=$(Build.BuildId)"
+
+        echo "rootDirectory=$(rootDirectory)"
+        echo "projectDirectory=$(projectDirectory)"
+        echo "workingDirectory=$(workingDirectory)"
+        echo "projectFullName=$(projectFullName)"
+        echo "projectFullPath=$(projectFullPath)"
+        echo "buildInfoFilePath=$(buildInfoFilePath)"
+    continueOnError: true
+
+  - task: CmdLine@2
+    displayName: 'Display Files'
+    inputs:
+      script: |
+        echo "Directory of Default Working Directory:"
+        tree -L 4 $(System.DefaultWorkingDirectory)
+    continueOnError: true
+
+  - task: NuGetToolInstaller@1
+    displayName: 'Install Nuget'
+
+  - task: CmdLine@2
+    displayName: "Put Build Details in buildinfo.json"
+    inputs:
+      script: |
+        echo {"buildDate":"$(runDateTime)","buildNumber":"$(Build.BuildNumber)","buildId":"$(Build.BuildId)","branchName":"$(Build.SourceBranchName)","commitHash":"$(Build.SourceVersion)"} > $(buildInfoFilePath)
+    continueOnError: true
+  
+  - task: UseDotNet@2
+    displayName: 'Use dotnet 10.0'
+    inputs:
+      version: 10.0.x
+
+  - task: Assembly-Info-NetCore@3
+    displayName: 'Update Assembly Version'
+    inputs:
+      Path: '$(Build.SourcesDirectory)'
+      FileNames: '$(projectDirectory)*.csproj'
+      InsertAttributes: true
+      FileEncoding: 'auto'
+      WriteBOM: true
+      FailOnWarning: true
+      PackageVersion: '$(appVersion)'
+      UpdateBuildNumber: '$(appVersion)'
+      AddBuildTag: 'v$(appVersion)'
+    continueOnError: true
+    
+  - task: DotNetCoreCLI@2
+    displayName: 'Restore Project'
+    inputs:
+      command: 'restore'
+      projects: '$(projectFullName)'
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Build Project'
+    inputs:
+      command: 'build'
+      projects: '$(projectFullName)'
+      arguments: --configuration $(buildConfiguration) --no-restore
+      workingDirectory: '$(projectDirectory)'
+
+  # ------------------------------------------------------------------------------------------------------------------------
+  - ${{ if eq(lower(parameters.runUnitTests), 'true') }}:
+    - task: DotNetCoreCLI@2
+      displayName: 'Restore Tests'
+      inputs:
+        command: 'restore'
+        projects: '$(testFullName)'
+
+    - task: DotNetCoreCLI@2
+      displayName: 'Run Tests'
+      inputs:
+        command: 'test'
+        workingDirectory: '$(testDirectory)'
+        publishTestResults: false
+        arguments: '--logger trx --results-directory "$(Build.SourcesDirectory)/TestResults/Coverage/" --collect "XPlat Code Coverage" --settings "$(testDirectory)coverage.runsettings"'
+
+    - task: PublishTestResults@2
+      displayName: 'Publish Test Results'
+      condition: succeededOrFailed()
+      inputs:
+        testResultsFormat: VSTest
+        testResultsFiles: '**/*.trx'
+        searchFolder: '$(Build.SourcesDirectory)/TestResults/Coverage/'
+        testRunTitle: 'Unit Tests'
+  # ------------------------------------------------------------------------------------------------------------------------
+
+  - task: DotNetCoreCLI@2
+    displayName: 'Run DotNet Publish'
+    condition: succeededOrFailed()
+    inputs:
+      command: 'publish'
+      projects: '$(projectFullName)'
+      publishWebProjects: false
+      arguments: --configuration $(buildConfiguration) --no-build --output $(System.DefaultWorkingDirectory)/_output
+      workingDirectory: '$(projectDirectory)'
+
+  - task: PublishPipelineArtifact@1
+    displayName: 'Publish Artifacts'
+    condition: succeededOrFailed()
+    inputs:
+      targetPath: $(System.DefaultWorkingDirectory)/_output
+      artifact: drop
+      publishLocation: 'pipeline'
+
+  - task: CmdLine@2
+    displayName: 'Display Directory Tree'
+    condition: succeededOrFailed()
+    inputs:
+      script: |
+        tree -L 4 $(System.DefaultWorkingDirectory)
+        tree -L 4 $(Build.ArtifactStagingDirectory)
+
+# ------------------------------------------------------------------------------------------------------------------------
+  - ${{ if eq(lower(parameters.runUnitTests), 'true') }}:
+    - task: DotNetCoreCLI@2
+      displayName: 'Install Report Generator'
+      condition: succeededOrFailed()
+      inputs:
+        command: custom
+        custom: tool
+        arguments: 'install -g dotnet-reportgenerator-globaltool'
+
+    - task: PowerShell@2
+      displayName: 'Create Code Coverage Report'
+      condition: succeededOrFailed()
+      inputs:
+        targetType: 'inline'
+        script: reportgenerator -reports:$(Build.SourcesDirectory)/**/coverage.cobertura.xml -targetdir:$(Build.SourcesDirectory)/CodeCoverage -reporttypes:HtmlInline_AzurePipelines
+
+    - task: CmdLine@2
+      displayName: 'Display Files'
+      condition: succeededOrFailed()
+      inputs:
+        script: |
+          echo "Directory of Build.SourcesDirectory:"
+          tree -L 4 $(Build.SourcesDirectory)
+      continueOnError: true
+
+    - task: PublishCodeCoverageResults@2
+      displayName: 'Publish Code Coverage Report'
+      condition: succeededOrFailed()
+      inputs:
+        codeCoverageTool: 'cobertura'
+        summaryFileLocation: '$(Build.SourcesDirectory)/**/coverage.cobertura.xml'

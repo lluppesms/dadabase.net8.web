@@ -1,0 +1,88 @@
+# ------------------------------------------------------------------------------------------------------------------------
+# Pipeline Template to build and deploy Azure Resources and Function
+# ------------------------------------------------------------------------------------------------------------------------
+parameters:
+- name: environments
+  type: object
+  default: ['DEV']
+- name: singleEnvironment
+  default: 'false'
+- name: deployBicep
+  default: false
+- name: parseBicepOutputs
+  default: false
+- name: runUnitTests
+  default: 'false'
+- name: runSmokeTests
+  default: 'false'
+- name: runGHASScan
+  default: 'false'
+- name: runMSDevSecOpsScan
+  default: 'false'
+- name: deploymentType
+  default: 'functionapp' # 'webapp' | 'containerapp' | 'functionapp' | 'all'
+
+# ----------------------------------------------------------------------------------------------------
+stages:
+- stage: ScanApplication
+  displayName: Scan Application
+  jobs:
+  - ${{ if or(eq(lower(parameters.runMSDevSecOpsScan), 'true'), eq(lower(parameters.runGHASScan), 'true')) }}:
+    - template: ../jobs/scan-code-job.yml
+      parameters:
+        environmentName: 'DEV'
+        runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
+        runGHASScan: ${{ parameters.runGHASScan }}
+  - ${{ else }}:
+    - job: ScanSkippedJob
+      displayName: Skipping Scan
+
+# ----------------------------------------------------------------------------------------------------
+- stage: BuildFunction
+  displayName: Build Function
+  dependsOn: ScanApplication
+  jobs:
+  - template: ../jobs/function-build-job.yml
+    parameters:
+      environmentName: 'DEV'
+      runUnitTests: ${{ parameters.runUnitTests }}
+
+# ----------------------------------------------------------------------------------------------------
+- ${{ each environmentName in parameters.environments }} :
+  - stage: CreateInfra${{ environmentName }}
+    displayName: ${{ environmentName }} Infrastructure
+    dependsOn: BuildFunction
+    # Condition is deployBicep is true AND (build complete and a single environment is being deployed, 
+    # or the environment is 'dev', or if qa/prod, the previous stage (dev->qa or qa->prod) succeeded)
+    condition: and(eq(${{ parameters.deployBicep }}, true), or(eq(${{ parameters.singleEnvironment }}, 'true'), and(eq(upper('${{ environmentName }}'), 'DEV'), succeeded('BuildFunction')), and(eq(upper('${{ environmentName }}'), 'QA'), succeeded('DeployFunctionDEV')), and(eq(upper('${{ environmentName }}'), 'PROD'), succeeded('DeployFunctionQA'))))
+    jobs:
+    - template: ../jobs/bicep-deploy-job.yml
+      parameters:
+        environmentName: ${{ environmentName }}
+        parseBicepOutputs: ${{ parameters.parseBicepOutputs }}
+        deploymentType: ${{ parameters.deploymentType }}
+
+  - stage: DeployFunction${{ environmentName }}
+    displayName: Deploy ${{ environmentName }} Function
+    dependsOn: CreateInfra${{ environmentName }}
+    # Run if infrastructure deployment succeeded (when deployBicep=true) OR if deployBicep=false (skip infra)
+    condition: or(and(succeeded('CreateInfra${{ environmentName }}'), eq(${{ parameters.deployBicep }}, true)), eq(${{ parameters.deployBicep }}, false))
+    jobs:
+    - template: ../jobs/function-deploy-job.yml
+      parameters:
+        environmentName: ${{ environmentName }}
+
+  - ${{ if eq(lower(parameters.runSmokeTests), 'true') }}:
+    - stage: SmokeTest${{ environmentName }}Function
+      displayName: Smoke Test ${{ environmentName }}
+      dependsOn: DeployFunction${{ environmentName }}
+      condition: succeeded('DeployFunction${{ environmentName }}')
+      variables:
+        - template: ../vars/var-common.yml
+      jobs:
+      - template: ../jobs/playwright-job.yml
+        parameters:
+          environment: ${{ environmentName }}
+          testType: '${{ variables.playwrightAPITestType }}'
+          testPath: ${{ variables.playwrightAPITestPath }}
+          debug: true

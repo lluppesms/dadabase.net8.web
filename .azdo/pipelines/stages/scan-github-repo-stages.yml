@@ -1,0 +1,64 @@
+# ------------------------------------------------------------------------------------------------------------------------
+# Pipeline Stage Template to Trigger and Monitor GitHub Code Scan Workflow -- this will trigger a GitHub Action remotely.
+# ------------------------------------------------------------------------------------------------------------------------
+# Authentication options = GitHub PAT token or GitHub App mode [recommended for better security]
+#   See github-get-auth-token-steps.yml file for details on how to set up each authentication mode.
+# ------------------------------------------------------------------------------------------------------------------------
+parameters:
+- name: githubOwner
+  default: ''
+- name: githubRepository
+  default: ''
+- name: githubWorkflowFile
+  default: '7-scan-code.yml'
+- name: githubRef
+  default: 'main'
+- name: runMSDevSecOpsScan
+  default: false
+- name: runGHASScan
+  default: true
+- name: authMode
+  default: 'GITHUB_APP' # 'GITHUB_PAT_TOKEN' or 'GITHUB_APP'
+
+# ----------------------------------------------------------------------------------------------------
+stages:
+- stage: ScanRemoteRepoStage
+  displayName: Scan Remote Repo
+  jobs:
+  - job: ScanRemoteRepoJob
+    displayName: Scan Remote Repo Job
+    steps:
+      # Get a GitHub API token using the selected authentication mode (PAT or GitHub App) and set it as GH_API_TOKEN for subsequent steps
+      - template: ../steps/github-get-auth-token-steps.yml
+        parameters:
+          authMode: ${{ parameters.authMode }}
+
+      # Trigger the GitHub workflow to run the scan and set githubRunId output variable for subsequent steps
+      - template: ../steps/github-dispatch-workflow-steps.yml
+        parameters:
+          githubOwner: ${{ parameters.githubOwner }}
+          githubRepository: ${{ parameters.githubRepository }}
+          githubWorkflowFile: ${{ parameters.githubWorkflowFile }}
+          githubRef: ${{ parameters.githubRef }}
+          runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
+          runGHASScan: ${{ parameters.runGHASScan }}
+          authMode: ${{ parameters.authMode }}
+          stepName: dispatchStep
+
+  - job: PollGitHubWorkflowJob
+    displayName: Poll GitHub Workflow Result
+    dependsOn: ScanRemoteRepoJob
+    variables:
+      githubRunId: $[ dependencies.ScanRemoteRepoJob.outputs['dispatchStep.githubRunId'] ]
+    steps:
+      # Get a GitHub API token using the selected authentication mode (PAT or GitHub App) and set it as GH_API_TOKEN for subsequent steps
+      - template: ../steps/github-get-auth-token-steps.yml
+        parameters:
+          authMode: ${{ parameters.authMode }}
+
+      # Watch the workflow to see if it succeeds or fails and set this pipeline to fail if the GitHub workflow fails
+      - template: ../steps/github-monitor-workflow-steps.yml
+        parameters:
+          githubOwner: ${{ parameters.githubOwner }}
+          githubRepository: ${{ parameters.githubRepository }}
+          authMode: ${{ parameters.authMode }}

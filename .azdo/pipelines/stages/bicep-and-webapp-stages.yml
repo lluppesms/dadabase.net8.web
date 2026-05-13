@@ -1,0 +1,84 @@
+# ------------------------------------------------------------------------------------------------------------------------
+# Pipeline Template to build and deploy Azure Resources and Application
+# ------------------------------------------------------------------------------------------------------------------------
+parameters:
+- name: environments
+  type: object
+  default: ['DEV']
+- name: deployBicep
+  default: false
+- name: parseBicepOutputs
+  default: false
+- name: runGHASScan
+  type: boolean
+  default: false
+- name: runMSDevSecOpsScan
+  type: boolean
+  default: false
+- name: runSmokeTest
+  type: boolean
+  default: false
+- name: runUnitTests
+  type: boolean
+  default: false
+- name: deploymentType
+  type: string
+  default: 'webapp' # 'webapp' | 'containerapp' | 'functionapp' | 'all'
+
+# ----------------------------------------------------------------------------------------------------
+stages:
+- ${{ if or(eq(parameters.runMSDevSecOpsScan, true), eq(parameters.runGHASScan, true)) }}:
+  - stage: ScanApplication
+    displayName: Scan Application
+    jobs:
+    - template: ../jobs/scan-code-job.yml
+      parameters:
+        environmentName: 'DEV'
+        runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
+        runGHASScan: ${{ parameters.runGHASScan }}
+
+# ----------------------------------------------------------------------------------------------------
+- stage: BuildWebApp
+  displayName: Build WebApp
+  jobs:
+  - template: ../jobs/webapp-build-job.yml
+    parameters:
+      environmentName: 'DEV'
+      runUnitTests: ${{ parameters.runUnitTests }}
+
+# ----------------------------------------------------------------------------------------------------
+- ${{ each environmentName in parameters.environments }} :
+  - stage: CreateInfrastructure${{ environmentName }}
+    displayName: ${{ environmentName }} Infrastructure
+    dependsOn: BuildWebApp
+    condition: and(succeeded('BuildWebApp'), eq(${{ parameters.deployBicep }}, true))
+    jobs:
+    - template: ../jobs/bicep-deploy-job.yml
+      parameters:
+        environmentName: ${{ environmentName }}
+        parseBicepOutputs: ${{ parameters.parseBicepOutputs }}
+        deploymentType: ${{ parameters.deploymentType }}
+
+  - stage: Deploy${{ environmentName }}WebApp
+    displayName: Deploy ${{ environmentName }} WebApp
+    dependsOn: CreateInfrastructure${{ environmentName }}
+    condition: or(and(succeeded('CreateInfrastructure${{ environmentName }}'), eq(${{ parameters.deployBicep }}, true)), eq(${{ parameters.deployBicep }}, false))
+    jobs:
+    - template: ../jobs/webapp-deploy-job.yml
+      parameters:
+        environmentName: ${{ environmentName }}
+
+  - ${{ if eq(parameters.runSmokeTest, true) }}:
+    - stage: BasicTest${{ environmentName }}WebApp
+      displayName: Basic Test ${{ environmentName }}
+      dependsOn: Deploy${{ environmentName }}WebApp
+      condition: succeeded('Deploy${{ environmentName }}WebApp')
+      variables:
+        - template: ../vars/var-common.yml
+      jobs:
+      - template: ../jobs/playwright-job.yml
+        parameters:
+          environment: ${{ environmentName }}
+          testType: ${{ variables.playwrightBasicTestType }}
+          testPath: ${{ variables.playwrightBasicTestPath }}
+          debug: true

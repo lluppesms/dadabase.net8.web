@@ -1,0 +1,449 @@
+# ----------------------------------------------------------------------------------------------------
+# Code Scanning Template
+# ----------------------------------------------------------------------------------------------------
+# GitHub Advanced Security For Azure DevOps
+# To enable this, you must enable GHAzDO for this repository in your Azure DevOps Project
+# ----------------------------------------------------------------------------------------------------
+# Microsoft Secure DevOps Scan
+# To enable this, you must add Azure DevOps Extension to your Azure DevOps Organization
+# See https://marketplace.visualstudio.com/items?itemName=ms-securitydevops.microsoft-security-devops-azdevops
+# ----------------------------------------------------------------------------------------------------
+parameters:
+- name: environmentName
+  default: 'DEV'
+- name: runGHASScan
+  default: 'false'
+- name: runMSDevSecOpsScan
+  default: 'false'
+# - name: runGHASADOGitHubRepoScan
+#   default: 'false'
+- name: continueOnScanError
+  default: 'true'
+
+# ----------------------------------------------------------------------------------------------------
+jobs:
+- deployment: CodeScanDeployment
+  displayName: Initialize Code Scans
+  environment: ${{ parameters.environmentName }}
+
+# ----------------------------------------------------------------------------------------------------
+- ${{ if and(eq(lower(parameters.runGHASScan), 'false'), eq(lower(parameters.runMSDevSecOpsScan), 'false')) }}:
+  - job: NoScanJob
+    displayName: No Scan Requested
+    steps:
+      - bash: |
+          echo "No MS DevOps or GHAS scan requested!"
+        displayName: 'Stub Step'
+
+# ----------------------------------------------------------------------------------------------------
+- ${{ if eq(lower(parameters.runGHASScan), 'true') }}:
+  - job: GHASScanJob
+    displayName: GHAS Scan Job
+    variables:
+      - name: continueAfterScanErrors
+        value: ${{ eq(parameters.continueOnScanError, 'true') }}
+      - template: ../vars/var-common.yml
+
+    steps:
+    # Simplest example that sometimes works...
+    # - task: AdvancedSecurity-Codeql-Init@1
+    #   inputs:
+    #     languages: 'csharp'
+    # - task: DotNetCoreCLI@2
+    #   inputs:
+    #     command: 'restore'
+    # - task: AdvancedSecurity-Dependency-Scanning@1
+    # - task: AdvancedSecurity-Codeql-Autobuild@1
+    # - task: AdvancedSecurity-Codeql-Analyze@1
+    # - task: AdvancedSecurity-Publish@1
+
+    - task: CmdLine@2
+      displayName: 'Display Variables and Tree'
+      inputs:
+        script: |
+          echo "parameters.continueOnScanError=${{ parameters.continueOnScanError }}"
+
+          echo "webAppFolderName=$(webAppFolderName)"
+          echo "webAppSolutionName=$(webAppSolutionName)"
+          echo "webAppProjectName=$(webAppProjectName)"
+          echo "webAppProjectFolderName=$(webAppProjectFolderName)"
+          echo "Web Project Path: $(Build.SourcesDirectory)/$(webAppProjectFolderName)/*.$(webAppProjectExtension)"
+
+          echo "functionFolderName=$(functionFolderName)"
+          echo "functionSolutionName=$(functionSolutionName)"
+          echo "functionProjectName=$(functionProjectName)"
+          echo "functionProjectFolderName=$(functionProjectFolderName)"
+          echo "Function Project Path: $(Build.SourcesDirectory)/$(functionProjectFolderName)/*.$(functionProjectExtension)"
+
+          echo "sqlAppFolderName=$(sqlAppFolderName)"
+          echo "sqlAppSolutionName=$(sqlAppSolutionName)"
+          echo "sqlAppProjectName=$(sqlAppProjectName)"
+          echo "SQL Project Path: $(Build.SourcesDirectory)/$(sqlAppProjectFolderName)/*.$(sqlAppProjectExtension)"
+
+          echo "workingDirectoryInfra=$(workingDirectoryInfra)"
+          echo "workingDirectoryIgnore=$(workingDirectoryIgnore)"
+          echo "Build.SourcesDirectory=$(Build.SourcesDirectory)"
+          echo "----------------------------------------"
+          echo "##[group]Display All Environment Variables:"
+          printenv | sort
+          echo "##[endgroup]"
+          echo "------------------------------------------------"
+          echo "##[group]Directory of Project Files: $(Build.SourcesDirectory)/src"
+          tree -L 4 $(Build.SourcesDirectory)/src
+          echo "##[endgroup]"
+          echo "------------------------------------------------"
+          echo "##[group]Directory of Full Staging Directory: $(Build.SourcesDirectory)"
+          tree -L 4 $(Build.SourcesDirectory)
+          echo "##[endgroup]"
+      continueOnError: true
+
+    - task: AdvancedSecurity-Codeql-Init@1
+      displayName: GHAS Init
+      inputs:
+        languages: 'csharp'
+        querysuite: security-extended
+      #   sourcesfolder: $(webAppProjectFolderName)
+      #   codeqlpathstoinclude: $(webAppProjectFolderName)
+      #   codeqlpathstoignore: $(workingDirectoryIgnore)
+
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    # You may be able to use autobuild, but I replaced it with specific build steps in this pipeline 
+    # because of of multiple projects and the fact that SQL DACPAC projects that don't work well with the AutoBuild task.
+    # If your project builds successfully with AutoBuild, you can uncomment the following lines and remove the specific build steps.
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    #   - task: AdvancedSecurity-Codeql-Autobuild@1
+    #     displayName: GHAS AutoBuild
+    #     continueOnError: ${{ eq(parameters.continueOnScanError, 'true') }}
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    # Custom Build steps for this project (Web, Function, and DacPac projects)
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+    - template: ../steps/scan-code-compile-steps.yml
+    # - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - 
+
+    - task: AdvancedSecurity-Dependency-Scanning@1
+      displayName: GHAS Dependency Scanning
+      continueOnError: ${{ eq(parameters.continueOnScanError, 'true') }}
+
+    - task: AdvancedSecurity-Codeql-Analyze@1
+      displayName: GHAS Analyze
+      continueOnError: ${{ eq(parameters.continueOnScanError, 'true') }}
+
+    - task: AdvancedSecurity-Publish@1
+      displayName: GHAS Publish
+      continueOnError: ${{ eq(parameters.continueOnScanError, 'true') }}
+
+# ----------------------------------------------------------------------------------------------------
+- ${{ if eq(lower(parameters.runMSDevSecOpsScan), 'true') }}:
+  - job: MSDevSecOpsScanJob
+    displayName: MS DevSecOps Scan Job
+    variables:
+      - name: continueAfterScanErrors
+        value: ${{ eq(parameters.continueOnScanError, 'true') }}
+      - name: nugetScanSolutionPattern
+        value: 'dadabase*.sln'
+      - name: nugetScanProjectPattern
+        value: 'dadabase*.csproj'
+      - template: ../vars/var-common.yml
+    steps:
+    - bash: |
+        echo "parameters.runMSDevSecOpsScan=${{parameters.runMSDevSecOpsScan}}"
+        echo "appProjectFolderName=${{variables.appProjectFolderName}}"
+        echo "workingDirectoryInfra=${{variables.workingDirectoryInfra}}"
+        echo "workingDirectoryIgnore=${{variables.workingDirectoryIgnore}}"
+        echo "continueAfterScanErrors=$(continueAfterScanErrors)"
+        echo "parameters.continueOnScanError=${{parameters.continueOnScanError}}"
+        echo "sourceVariableFile=$(sourceVariableFile)"
+        echo "appProjectFolderName=$(webAppProjectFolderName)"
+        echo "workingDirectoryInfra=$(workingDirectoryInfra)"
+        echo "workingDirectoryIgnore=$(workingDirectoryIgnore)"
+        echo "----------------------------------------"
+        echo "##[group]Display All Environment Variables:"
+        printenv | sort
+        echo "##[endgroup]"
+        echo "----------------------------------------"
+        echo "##[group]Directory Listing for $(Pipeline.Workspace)"
+        tree -L 4 $(Pipeline.Workspace)
+        echo "##[endgroup]"
+      displayName: 'Display Variables'
+      continueOnError: true
+
+    - task: UseDotNet@2
+      displayName: 'Use dotnet 8.0'
+      inputs:
+        version: 8.0.x
+
+    - task: UseDotNet@2
+      displayName: 'Use dotnet 10.0'
+      inputs:
+        version: 10.0.x
+
+    - task: MicrosoftSecurityDevOps@1
+      displayName: 'Run Microsoft Security DevOps'
+      continueOnError: true
+
+    - task: CmdLine@2
+      displayName: Install Additional Security Tools
+      inputs:
+        script: |
+          echo "Installing additional security tools..."
+          pip install safety semgrep
+
+    - task: PowerShell@2
+      displayName: Python Dependency Vulnerability Scan (Safety)
+      continueOnError: true
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "Scanning for known vulnerabilities in dependencies..."
+          if (Test-Path "requirements.txt") {
+            # Generate SARIF output for Advanced Security integration
+            safety check -r requirements.txt --output sarif --save-as safety-report.sarif
+            
+            # Generate JSON output for artifact archival
+            safety check -r requirements.txt --json --output safety-report.json
+            if ($LASTEXITCODE -ne 0) { Write-Host "Vulnerability scan completed with findings" }
+
+            if (Test-Path "safety-report.sarif") { 
+              Write-Host "Safety SARIF report generated"
+            } else { 
+              Write-Host "No Safety SARIF report generated, creating empty file";
+              "" | Out-File -FilePath "safety-report.sarif" -Encoding utf8 
+            }
+            if (Test-Path "safety-report.json") { 
+              Write-Host "Safety JSON report generated"
+              Get-Content safety-report.json 
+            } else { 
+              Write-Host "No Safety JSON report generated, creating empty file";
+              "" | Out-File -FilePath "safety-report.json" -Encoding utf8 
+            }
+          } else {
+            "" | Out-File -FilePath "safety-report.sarif" -Encoding utf8 
+            "" | Out-File -FilePath "safety-report.json" -Encoding utf8 
+            Write-Host "No requirements.txt found, skipping dependency scan"
+          }
+    - task: PowerShell@2
+      displayName: Secrets and Code Quality Scan (Semgrep)
+      continueOnError: true
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "Scanning for secrets and credentials..."
+          # Set UTF-8 encoding for Python to handle Unicode characters in source files
+          $env:PYTHONIOENCODING = "utf-8"
+          $env:PYTHONUTF8 = "1"
+          $files = Get-ChildItem -Recurse -Include *.cs,*.razor,*.yml,*.yaml,*.json,*.bicep,*.tf -File
+          if ($files) {
+            # Generate both SARIF (for Advanced Security) and JSON (for artifact) outputs
+            semgrep --config=auto --sarif --output=semgrep-report.sarif .
+            semgrep --config=auto --json --output=semgrep-report.json .
+            if ($LASTEXITCODE -ne 0) { Write-Host "Secret scan completed" }
+            if (Test-Path "semgrep-report.sarif") { 
+              Write-Host "SARIF report generated for Advanced Security"
+            } else { 
+              Write-Host "No semgrep SARIF report generated, creating empty file"
+              "" | Out-File -FilePath "semgrep-report.sarif" -Encoding utf8
+            }
+            if (Test-Path "semgrep-report.json") { 
+              Write-Host "JSON report generated for artifact"
+              Get-Content semgrep-report.json 
+            } else { 
+              Write-Host "No semgrep report generated, creating empty file"
+              "" | Out-File -FilePath "semgrep-report.json" -Encoding utf8
+            }
+          } else {
+            Write-Host "No files found for secret scanning"
+          }
+
+    - task: PowerShell@2
+      displayName: NuGet Package Vulnerability Scan
+      continueOnError: true
+      inputs:
+        targetType: 'inline'
+        script: |
+          Write-Host "Scanning for known vulnerabilities in NuGet packages..."
+          $solutions = Get-ChildItem -Recurse -Filter $(nugetScanSolutionPattern)
+          foreach ($solution in $solutions) {
+            Write-Host "Restoring solution: $($solution.FullName)"
+            dotnet restore $solution.FullName 
+            Write-Host "Checking solution: $($solution.FullName)"
+            dotnet list $solution.FullName package --vulnerable --include-transitive 2>&1 | Tee-Object -Variable output
+            if ($output -match "has the following vulnerable packages") {
+              Write-Host "##vso[task.logissue type=warning]Vulnerable packages found in $($solution.Name)"
+            }
+          }
+          if (!$solutions) {
+            Write-Host "No solution files found, checking individual projects..."
+            $projects = Get-ChildItem -Recurse -Filter $(nugetScanProjectPattern)
+            foreach ($project in $projects) {
+              Write-Host "Restoring project: $($project.FullName)"
+              dotnet restore $project.FullName
+              Write-Host "Checking project: $($project.FullName)"
+              dotnet list $project.FullName package --vulnerable --include-transitive
+            }
+          }
+
+    - task: PowerShell@2
+      displayName: Display Files
+      continueOnError: true
+      inputs:
+        targetType: 'inline'
+        script: |
+          Get-ChildItem -Path $(System.DefaultWorkingDirectory) -Recurse -Depth 5 | Select-Object FullName
+
+    - task: AdvancedSecurity-Publish@1
+      displayName: Add Safety Results to Advanced Security
+      inputs:
+        SarifFiles: '$(System.DefaultWorkingDirectory)/safety-report.sarif'
+      continueOnError: true
+    - task: PublishBuildArtifacts@1
+      displayName: Publish Safety Report
+      inputs:
+        pathToPublish: '$(System.DefaultWorkingDirectory)/safety-report.json'
+        artifactName: 'safety-reports'
+        publishLocation: 'Container'
+      condition: always()
+      continueOnError: true
+
+    - task: AdvancedSecurity-Publish@1
+      displayName: Add Semgrep Results to Advanced Security
+      inputs:
+        SarifFiles: '$(System.DefaultWorkingDirectory)/semgrep-report.sarif'
+      continueOnError: true
+    - task: PublishBuildArtifacts@1
+      displayName: Publish Semgrep Report
+      inputs:
+        pathToPublish: '$(System.DefaultWorkingDirectory)/semgrep-report.json'
+        artifactName: 'semgrep-reports'
+        publishLocation: 'Container'
+      condition: always()
+      continueOnError: true
+
+# # ----------------------------------------------------------------------------------------------------
+# # This example is trying to show how to do a GHAS scan in an Azure DevOps pipeline when the repository lives in GitHub.
+# # If you try to use the GHAS steps and actions above, you get the error:
+# #   [error] The AdvancedSecurity CodeQL build task only supports Azure DevOps Git repositories.
+# # ----------------------------------------------------------------------------------------------------
+# # This blog from 2020 may be relevant (or not...)
+# #   https://github.blog/news-insights/product-news/code-scanning-a-github-repository-using-github-advanced-security-within-an-azure-devops-pipeline/
+# # ----------------------------------------------------------------------------------------------------
+# # UNTESTED CODE....! Not sure if this is correct or will work...! GHCP Generated
+# # ----------------------------------------------------------------------------------------------------
+# # CodeQL for GitHub-hosted repos from Azure DevOps
+# # ----------------------------------------------------------------------------------------------------
+# # This job is for repositories hosted in GitHub where AzDO GHAS tasks are not supported.
+# # It uses modern CodeQL CLI to produce SARIF, then uploads the SARIF to GitHub Code Scanning.
+# # Requires secret variable: GITHUB_PAT with permission to upload code scanning results.
+# # Prefer GitHub App auth over PAT when available.
+# # ----------------------------------------------------------------------------------------------------
+# - ${{ if eq(lower(parameters.runGHASADOGitHubRepoScan), 'true') }}:
+#   - job: GHASADOScanJob
+#     displayName: GHAS ADO Scan Job
+#     variables:
+#       - name: continueAfterScanErrors
+#         value: ${{ eq(parameters.continueOnScanError, 'true') }}
+#       - name: githubRepository
+#         value: $(Build.Repository.Name)
+#       - template: ../vars/var-common.yml
+#
+#     steps:
+#     - task: UseDotNet@2
+#       inputs:
+#         version: 10.0.x
+#       displayName: 'Use dotnet 10.0'
+#
+#     - bash: |
+#         set -euo pipefail
+#         BUNDLE_URL="https://github.com/github/codeql-action/releases/latest/download/codeql-bundle-linux64.tar.gz"
+#         TOOLS_DIR="$(Agent.TempDirectory)/codeql-tools"
+#         mkdir -p "$TOOLS_DIR"
+#         curl -sSL "$BUNDLE_URL" -o "$TOOLS_DIR/codeql-bundle.tgz"
+#         tar -xzf "$TOOLS_DIR/codeql-bundle.tgz" -C "$TOOLS_DIR"
+#         echo "##vso[task.prependpath]$TOOLS_DIR/codeql"
+#         codeql version
+#       displayName: 'Install latest CodeQL CLI bundle'
+#
+#     - bash: |
+#         set -euo pipefail
+#         DB_PATH="$(Agent.TempDirectory)/codeql-db"
+#         rm -rf "$DB_PATH"
+#
+#         codeql database create "$DB_PATH" \
+#           --language=csharp \
+#           --source-root "$(Build.SourcesDirectory)" \
+#           --command "dotnet build $(Build.SourcesDirectory)/src/DadABase.Web/DadABase.Web.csproj -c Release"
+#       displayName: 'Create CodeQL database'
+#
+#     - bash: |
+#         set -euo pipefail
+#         DB_PATH="$(Agent.TempDirectory)/codeql-db"
+#         SARIF_PATH="$(Build.ArtifactStagingDirectory)/codeql-results.sarif"
+#
+#         codeql database analyze "$DB_PATH" \
+#           csharp-security-and-quality.qls \
+#           --format=sarif-latest \
+#           --output "$SARIF_PATH"
+#
+#         echo "SARIF generated at: $SARIF_PATH"
+#       displayName: 'Analyze and generate SARIF'
+#
+#     - bash: |
+#         set -euo pipefail
+#         SARIF_PATH="$(Build.ArtifactStagingDirectory)/codeql-results.sarif"
+#         SARIF_B64=$(base64 -w 0 "$SARIF_PATH")
+#
+#         API_URL="https://api.github.com/repos/$(githubRepository)/code-scanning/sarifs"
+#
+#         curl -sS -X POST "$API_URL" \
+#           -H "Authorization: token $GITHUB_PAT" \
+#           -H "Accept: application/vnd.github+json" \
+#           -H "Content-Type: application/json" \
+#           -d "{\"commit_sha\":\"$(Build.SourceVersion)\",\"ref\":\"$(Build.SourceBranch)\",\"sarif\":\"$SARIF_B64\",\"checkout_uri\":\"file://$(Build.SourcesDirectory)\",\"tool_name\":\"CodeQL CLI (Azure DevOps)\"}"
+#       displayName: 'Upload SARIF to GitHub Code Scanning'
+#
+#     - task: PublishBuildArtifacts@1
+#       displayName: 'Publish CodeQL SARIF artifact'
+#       inputs:
+#         PathtoPublish: '$(Build.ArtifactStagingDirectory)/codeql-results.sarif'
+#         ArtifactName: 'codeql-sarif'
+#         publishLocation: 'Container'
+#
+# # ----------------------------------------------------------------------------------------------------
+# # UNTESTED CODE....!  and currently unreachable...!
+# # ----------------------------------------------------------------------------------------------------
+# # For this example, you will need to create a GH Personal Access Token
+# # This example is using a PAT and pulling it from a pipeline variable named $GITHUB_PAT.
+# # This could/should be changed to use GitHub Apps for authentication.
+# # ----------------------------------------------------------------------------------------------------
+# - ${{ if eq(lower(parameters.runGHASADOGitHubRepoScan2), 'true') }}:
+#   - job: GHASADOScanOldJob
+#     displayName: GHAS ADO Old Scan Job
+#     variables:
+#       - name: continueAfterScanErrors
+#         value: ${{ eq(parameters.continueOnScanError, 'true') }}
+#       - name: githubRepository
+#         value: $(Build.Repository.Name)
+#       - template: ../vars/var-common.yml
+#
+#     steps:
+#     - task: NodeTool@0
+#       inputs:
+#         versionSpec: '10.x'
+#       displayName: 'Install Node.js'
+#
+#     - script: |
+#         npm install
+#         npm test
+#       displayName: 'npm install and test'
+#
+#     - script: |
+#         wget https://github.com/github/codeql-action/releases/download/codeql-bundle-20200826/codeql-runner-linux
+#         chmod +x codeql-runner-linux
+#       displayName: 'Get latest CodeQL package. Install on Agent.'
+#
+#     - script: |
+#         ./codeql-runner-linux init --repository $(githubRepository) --github-url https://github.com --github-auth $GITHUB_PAT
+#       displayName: 'Initialize CodeQ Executable and create a CodeQL database'
+#
+#     - script: |
+#         ./codeql-runner-linux analyze --repository $(githubRepository) --github-url https://github.com --github-auth $GITHUB_PAT --commit $(Build.SourceVersion) --ref $(Build.SourceBranch)
+#       displayName: 'Populate the CodeQL runner databases, analyze them, and upload the results to GitHub.'

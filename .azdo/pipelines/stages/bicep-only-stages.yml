@@ -1,0 +1,43 @@
+# ------------------------------------------------------------------------------------------------------------------------
+# Pipeline Template to deploy Azure Resources Only
+# ------------------------------------------------------------------------------------------------------------------------
+parameters:
+- name: environments
+  type: object
+  default: ['DEV']
+- name: singleEnvironment
+  default: 'false'
+- name: parseBicepOutputs
+  default: false
+- name: runGHASScan
+  default: 'false'
+- name: runMSDevSecOpsScan
+  default: 'false'
+- name: deploymentType
+  default: 'webapp' # 'webapp' | 'containerapp' | 'functionapp' | 'all'
+
+# ----------------------------------------------------------------------------------------------------
+stages:
+# - ${{ if or(eq(lower(parameters.runMSDevSecOpsScan), 'true'), eq(lower(parameters.runGHASScan), 'true')) }}:
+- stage: ScanApplication
+  displayName: Scan Application
+  jobs:
+  - template: ../jobs/scan-code-job.yml
+    parameters:
+      environmentName: 'DEV'
+      runMSDevSecOpsScan: ${{ parameters.runMSDevSecOpsScan }}
+      runGHASScan: ${{ parameters.runGHASScan }}
+
+# ----------------------------------------------------------------------------------------------------
+- ${{ each environmentName in parameters.environments }}:
+  - stage: CreateInfra${{ environmentName }}
+    # Condition is scan complete and a single environment is being deployed, 
+    # or the environment is 'dev', or if qa/prod, the previous stage (dev->qa or qa->prod) succeeded
+    condition: or(eq(${{ parameters.singleEnvironment }}, 'true'), and(eq(upper('${{ environmentName }}'), 'DEV'), succeeded('ScanApplication')), and(eq(upper('${{ environmentName }}'), 'QA'), succeeded('CreateInfraDEV')), and(eq(upper('${{ environmentName }}'), 'PROD'), succeeded('CreateInfraQA')))
+    displayName: Create ${{ environmentName }} ${{ parameters.deploymentType }} Resources
+    jobs:
+    - template: ../jobs/bicep-deploy-job.yml
+      parameters:
+        environmentName: ${{ environmentName }}
+        parseBicepOutputs: ${{ parameters.parseBicepOutputs }}
+        deploymentType: ${{ parameters.deploymentType }}
